@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Black & White Theme with Blurred School Background */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #000000;
+  color: #000000;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Blurred school background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('/images/school-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(6px) brightness(0.45);
+  z-index: -1;
+}
+
+/* Ensure all containers have proper layering */
+#__next {
+  position: relative;
+  z-index: 1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Custom scrollbar for black & white theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* Force black & white theme on inputs and selects */
+input,
+select,
+textarea {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid #4a4a4a;
+  border-radius: 8px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #888;
+}
+
+/* Card styling for black & white */
+.card {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #333;
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+}
+
+/* Table styling */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-weight: 600;
+}
+
+tr {
+  border-bottom: 1px solid #333;
+}
+
+td {
+  color: #e0e0e0;
+}
