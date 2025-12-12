@@ -32,7 +32,7 @@ export default function LoginForm() {
           <div className="text-center mb-8">
             <h2 className="text-4xl font-bold text-white mb-2">Login</h2>
           </div>
-          
+
           {error && (
             <div className="bg-red-900 bg-opacity-50 border border-red-500 text-white px-4 py-3 rounded">
               {error}
@@ -41,6 +41,8 @@ export default function LoginForm() {
 
           <div className="space-y-4">
             <Input
+              id="email"
+              name="email"
               type="email"
               placeholder="Username"
               value={email}
@@ -50,6 +52,8 @@ export default function LoginForm() {
             />
 
             <Input
+              id="password"
+              name="password"
               type="password"
               placeholder="Password"
               value={password}
@@ -57,6 +61,11 @@ export default function LoginForm() {
               required
               className="bg-white bg-opacity-15 backdrop-blur-sm text-white placeholder-gray-300 border-white border-opacity-30 rounded-full"
             />
+            <div className="flex justify-end">
+              <a href="/forgot-password" className="text-sm text-gray-300 hover:text-white transition-colors">
+                Forgot Password?
+              </a>
+            </div>
           </div>
 
           <Button type="submit" disabled={loading} fullWidth>

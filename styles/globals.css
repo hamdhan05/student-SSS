@@ -2,17 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Black & White Theme with Blurred School Background */
+/* Base Theme */
 body {
+  @apply bg-transparent text-gray-900 dark:text-white;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #000000;
-  color: #000000;
   position: relative;
   min-height: 100vh;
 }
@@ -26,8 +33,19 @@ body::before {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: blur(6px) brightness(0.45);
   z-index: -1;
+}
+
+/* Dark Mode: Darken and Blur */
+.dark body::before {
+  filter: blur(6px) brightness(0.45);
+}
+
+/* Light Mode: Lighten/White tint and Blur */
+body:not(.dark)::before {
+  filter: blur(8px) brightness(1.1);
+  background-color: rgba(255, 255, 255, 0.3);
+  /* More transparent to show image */
 }
 
 /* Ensure all containers have proper layering */

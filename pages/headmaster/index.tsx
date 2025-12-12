@@ -1,4 +1,5 @@
 import { useRequireAuth } from '@/lib/hooks/useAuth';
+import Layout from '@/components/UI/Layout';
 import { useState } from 'react';
 import Students from '@/components/Headmaster/Students';
 import Teachers from '@/components/Headmaster/Teachers';
@@ -32,6 +33,11 @@ export default function HeadmasterPortal() {
     { id: 'complaints' as TabType, label: 'Complaints', icon: '📝' },
   ];
 
+  const handleLogout = () => {
+    localStorage.removeItem('authUser');
+    window.location.href = '/login';
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'students':
@@ -52,53 +58,18 @@ export default function HeadmasterPortal() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-black bg-opacity-80 border-r border-gray-700 flex flex-col rounded-l-lg">
-        <div className="p-6 border-b border-gray-700">
-          <h1 className="text-2xl font-bold text-white">Headmaster Portal</h1>
-          <p className="text-gray-400 text-sm mt-1">{user.name}</p>
-        </div>
-
-        <nav className="flex-1 p-4">
-          <ul className="space-y-2">
-            {tabs.map((tab) => (
-              <li key={tab.id}>
-                <button
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-white text-black font-semibold'
-                      : 'text-gray-300 hover:bg-white hover:bg-opacity-10'
-                  }`}
-                >
-                  <span className="text-xl">{tab.icon}</span>
-                  <span>{tab.label}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="p-4 border-t border-gray-700">
-          <button
-            onClick={() => {
-              localStorage.removeItem('authUser');
-              window.location.href = '/login';
-            }}
-            className="w-full px-4 py-2 bg-red-900 bg-opacity-50 text-white rounded hover:bg-opacity-70 transition-colors"
-          >
-            Logout
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto rounded-r-lg">
-        <div className="p-8">
-          {renderContent()}
-        </div>
-      </main>
-    </div>
+    <Layout
+      title="Headmaster Portal"
+      user={{
+        ...user,
+        role: user.role || undefined,
+      }}
+      tabs={tabs}
+      activeTab={activeTab}
+      onTabChange={(id) => setActiveTab(id as TabType)}
+      onLogout={handleLogout}
+    >
+      {renderContent()}
+    </Layout>
   );
 }

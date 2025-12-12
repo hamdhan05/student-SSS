@@ -76,8 +76,11 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
     <Modal isOpen={isOpen} onClose={onClose} title="Edit Student Details">
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Personal Information */}
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-4">Personal Information</h3>
+        <div className="bg-white bg-opacity-5 p-6 rounded-xl border border-gray-700">
+          <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+            <span className="p-2 bg-blue-500 bg-opacity-20 rounded-lg text-blue-400">👤</span>
+            Personal Information
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
@@ -163,9 +166,13 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
           </div>
         </div>
 
+
         {/* Parent/Guardian Information */}
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-4">Parent/Guardian Information</h3>
+        <div className="bg-white bg-opacity-5 p-6 rounded-xl border border-gray-700">
+          <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+            <span className="p-2 bg-green-500 bg-opacity-20 rounded-lg text-green-400">👨‍👩‍👧</span>
+            Parent/Guardian Information
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Guardian Name</label>
@@ -208,6 +215,6 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
           </Button>
         </div>
       </form>
-    </Modal>
+    </Modal >
   );
 }

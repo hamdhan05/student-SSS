@@ -5,7 +5,7 @@ import AttendanceGrid from '@/components/Attendance/AttendanceGrid';
 import AttendanceBatchControls from '@/components/Attendance/AttendanceBatchControls';
 import StudentList from '@/components/Students/StudentList';
 import Calendar from '@/components/UI/Calendar';
-import Button from '@/components/UI/Button';
+import Layout from '@/components/UI/Layout';
 
 interface Teacher {
   id: string;
@@ -82,72 +82,71 @@ export default function TeacherPage() {
   };
 
   const handleBatchUpdate = (studentIds: string[], status: 'present' | 'absent' | 'late') => {
-    // Implement batch update logic
     console.log('Batch update:', studentIds, status);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('authUser');
+    window.location.href = '/login';
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center min-h-screen bg-black">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
       </div>
     );
   }
 
+  const tabs = [
+    { id: 'attendance', label: 'Attendance', icon: '📅' },
+    { id: 'students', label: 'Students', icon: '👥' },
+  ];
+
   return (
     <PrivateRoute allowedRoles={['teacher', 'headmaster']}>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto p-6">
+      <Layout
+        title="Teacher Details"
+        user={{ name: 'Headmaster', role: 'headmaster' }} // Assuming context from headmaster view
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={(id) => setActiveTab(id as any)}
+        onLogout={handleLogout}
+      >
+        <div className="space-y-6">
           {/* Header */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-800">{teacher?.name}</h1>
-                <p className="text-gray-600">{teacher?.subject} Teacher</p>
-                <p className="text-sm text-gray-500">{teacher?.email}</p>
+          <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl border border-white border-opacity-10 p-8">
+            <div class="flex items-center gap-6">
+              <div className="h-20 w-20 rounded-full bg-black bg-opacity-50 border border-gray-600 flex items-center justify-center text-3xl text-white font-bold shadow-lg">
+                {teacher?.name.charAt(0)}
               </div>
-              <Button onClick={() => router.push('/logout')} variant="secondary">
-                Logout
-              </Button>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <div className="bg-white rounded-lg shadow-md mb-6">
-            <div className="flex border-b border-gray-200">
-              <button
-                onClick={() => setActiveTab('attendance')}
-                className={`px-6 py-3 font-medium ${
-                  activeTab === 'attendance'
-                    ? 'border-b-2 border-blue-600 text-blue-600'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                Attendance
-              </button>
-              <button
-                onClick={() => setActiveTab('students')}
-                className={`px-6 py-3 font-medium ${
-                  activeTab === 'students'
-                    ? 'border-b-2 border-blue-600 text-blue-600'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                Students
-              </button>
+              <div>
+                <h1 className="text-3xl font-bold text-white mb-2">{teacher?.name}</h1>
+                <div className="flex flex-wrap gap-3">
+                  <span className="px-3 py-1 rounded-full bg-white bg-opacity-10 text-white text-sm border border-white border-opacity-20">
+                    {teacher?.subject} Teacher
+                  </span>
+                  <span className="px-3 py-1 rounded-full bg-white bg-opacity-10 text-white text-sm border border-white border-opacity-20">
+                    {teacher?.email}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Content */}
           {activeTab === 'attendance' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
-                <AttendanceBatchControls
-                  studentIds={students.map((s) => s.id)}
-                  date={selectedDate}
-                  onBatchUpdate={handleBatchUpdate}
-                />
-                <div className="mt-6">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="bg-white bg-opacity-5 rounded-xl border border-gray-700 p-6">
+                  <h3 className="text-xl font-bold text-white mb-4">Batch Actions</h3>
+                  <AttendanceBatchControls
+                    studentIds={students.map((s) => s.id)}
+                    date={selectedDate}
+                    onBatchUpdate={handleBatchUpdate}
+                  />
+                </div>
+                <div className="bg-white bg-opacity-5 rounded-xl border border-gray-700 p-6">
                   <AttendanceGrid
                     students={students}
                     date={selectedDate}
@@ -155,14 +154,17 @@ export default function TeacherPage() {
                   />
                 </div>
               </div>
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <Calendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
+              <div>
+                <div className="bg-white bg-opacity-5 rounded-xl border border-gray-700 p-6 sticky top-24">
+                  <h3 className="text-xl font-bold text-white mb-4">Select Date</h3>
+                  <Calendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
+                </div>
               </div>
             </div>
           )}
 
           {activeTab === 'students' && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white bg-opacity-5 rounded-xl border border-gray-700 p-6">
               <StudentList
                 students={students}
                 onStudentClick={(student) => router.push(`/students/${student.id}`)}
@@ -170,7 +172,7 @@ export default function TeacherPage() {
             </div>
           )}
         </div>
-      </div>
+      </Layout>
     </PrivateRoute>
   );
 }

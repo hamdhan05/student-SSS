@@ -54,7 +54,7 @@ export default function StudentDetailModal({
           {/* Header with Avatar */}
           <div className="flex items-center justify-between border-b border-gray-700 pb-6">
             <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-blue-500 flex items-center justify-center text-white text-2xl font-bold">
+              <div className="w-20 h-20 rounded-full bg-black bg-opacity-50 border border-gray-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                 {getInitials(student.name)}
               </div>
               <div>
@@ -150,13 +150,12 @@ export default function StudentDetailModal({
                         </td>
                         <td className="px-4 py-3 text-sm">
                           <span
-                            className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                              record.status === 'present'
+                            className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${record.status === 'present'
                                 ? 'bg-green-900 text-green-300'
                                 : record.status === 'absent'
-                                ? 'bg-red-900 text-red-300'
-                                : 'bg-yellow-900 text-yellow-300'
-                            }`}
+                                  ? 'bg-red-900 text-red-300'
+                                  : 'bg-yellow-900 text-yellow-300'
+                              }`}
                           >
                             {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
                           </span>

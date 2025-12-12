@@ -1,4 +1,5 @@
 import { useRequireAuth } from '@/lib/hooks/useAuth';
+import Layout from '@/components/UI/Layout';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getClasses, getSections, getStudents, markAttendanceBatch } from '@/lib/api';
@@ -73,7 +74,7 @@ export default function TeacherPortal() {
     }
 
     markAttendanceMutation.mutate({
-      classId: selectedClass,
+      classId: String(selectedClass),
       section: selectedSection,
       date: selectedDate,
       marks,
@@ -90,25 +91,28 @@ export default function TeacherPortal() {
 
   if (!user) return null;
 
+  const handleLogout = () => {
+    localStorage.removeItem('authUser');
+    window.location.href = '/login';
+  };
+
+  const tabs = [
+    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+  ];
+
   return (
-    <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto p-8 rounded-lg">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Teacher Portal</h1>
-            <p className="text-gray-400">Welcome, {user.name}</p>
-          </div>
-          <button
-            onClick={() => {
-              localStorage.removeItem('authUser');
-              window.location.href = '/login';
-            }}
-            className="px-6 py-2 bg-red-900 bg-opacity-50 text-white rounded hover:bg-opacity-70"
-          >
-            Logout
-          </button>
-        </div>
+    <Layout
+      title="Teacher Portal"
+      user={{
+        ...user,
+        role: user.role || undefined,
+      }}
+      tabs={tabs}
+      activeTab="dashboard"
+      onLogout={handleLogout}
+    >
+      <div className="max-w-7xl mx-auto p-0 rounded-lg">
+        {/* Header - Removed as it's in Layout */}
 
         {/* Attendance Section */}
         <div className="space-y-6">
@@ -117,8 +121,10 @@ export default function TeacherPortal() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Date</label>
+                <label htmlFor="date-input" className="block text-sm font-medium text-gray-300 mb-2">Date</label>
                 <Input
+                  id="date-input"
+                  name="date"
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
@@ -127,8 +133,10 @@ export default function TeacherPortal() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Class</label>
+                <label htmlFor="class-select" className="block text-sm font-medium text-gray-300 mb-2">Class</label>
                 <select
+                  id="class-select"
+                  name="class"
                   value={selectedClass}
                   onChange={(e) => setSelectedClass(Number(e.target.value))}
                   className="w-full px-4 py-2 rounded bg-white bg-opacity-10 text-white border border-gray-600"
@@ -142,8 +150,10 @@ export default function TeacherPortal() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Section</label>
+                <label htmlFor="section-select" className="block text-sm font-medium text-gray-300 mb-2">Section</label>
                 <select
+                  id="section-select"
+                  name="section"
                   value={selectedSection}
                   onChange={(e) => setSelectedSection(e.target.value)}
                   className="w-full px-4 py-2 rounded bg-white bg-opacity-10 text-white border border-gray-600"
@@ -194,21 +204,19 @@ export default function TeacherPortal() {
                                 onClick={() =>
                                   setAttendanceMarks((prev) => ({ ...prev, [student.id]: 'present' }))
                                 }
-                                className={`px-4 py-2 rounded font-medium transition-colors ${
-                                  status === 'present'
-                                    ? 'bg-green-700 text-white'
-                                    : 'bg-gray-800 text-white hover:bg-gray-700'
-                                }`}
+                                className={`px-4 py-2 rounded font-medium transition-colors ${status === 'present'
+                                  ? 'bg-green-700 text-white'
+                                  : 'bg-gray-800 text-white hover:bg-gray-700'
+                                  }`}
                               >
                                 Present
                               </button>
                               <button
                                 onClick={() => setAttendanceMarks((prev) => ({ ...prev, [student.id]: 'absent' }))}
-                                className={`px-4 py-2 rounded font-medium transition-colors ${
-                                  status === 'absent'
-                                    ? 'bg-red-700 text-white'
-                                    : 'bg-gray-800 text-white hover:bg-gray-700'
-                                }`}
+                                className={`px-4 py-2 rounded font-medium transition-colors ${status === 'absent'
+                                  ? 'bg-red-700 text-white'
+                                  : 'bg-gray-800 text-white hover:bg-gray-700'
+                                  }`}
                               >
                                 Absent
                               </button>
@@ -252,6 +260,6 @@ export default function TeacherPortal() {
           showEdit={false}
         />
       )}
-    </div>
+    </Layout>
   );
 }
