@@ -5,10 +5,12 @@ import Button from '@/components/UI/Button';
 import Input from '@/components/UI/Input';
 import AddTeacherModal from '@/components/Modals/AddTeacherModal';
 import TeacherDetailModal from '@/components/Modals/TeacherDetailModal';
+import TeacherEditModal from '@/components/Modals/TeacherEditModal';
 
 export default function Teachers() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddTeacherModalOpen, setIsAddTeacherModalOpen] = useState(false);
+  const [isEditTeacherModalOpen, setIsEditTeacherModalOpen] = useState(false);
   const [viewTeacherId, setViewTeacherId] = useState<string | null>(null);
 
   const { data: teachers = [], isLoading } = useQuery({
@@ -83,7 +85,13 @@ export default function Teachers() {
                 >
                   View Details
                 </button>
-                <button className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm">
+                <button
+                  onClick={() => {
+                    setViewTeacherId(teacher.id);
+                    setIsEditTeacherModalOpen(true);
+                  }}
+                  className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm"
+                >
                   Edit
                 </button>
               </div>
@@ -104,11 +112,21 @@ export default function Teachers() {
       />
 
       {viewTeacherId && (
-        <TeacherDetailModal
-          isOpen={!!viewTeacherId}
-          onClose={() => setViewTeacherId(null)}
-          teacherId={viewTeacherId}
-        />
+        <>
+          <TeacherDetailModal
+            isOpen={!!viewTeacherId && !isEditTeacherModalOpen}
+            onClose={() => setViewTeacherId(null)}
+            teacherId={viewTeacherId}
+          />
+          <TeacherEditModal
+            isOpen={isEditTeacherModalOpen}
+            onClose={() => {
+              setIsEditTeacherModalOpen(false);
+              setViewTeacherId(null);
+            }}
+            teacherId={viewTeacherId}
+          />
+        </>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { getStudentById } from '@/lib/api';
+import { getStudentById, updateStudent } from '@/lib/api';
 import Modal from '@/components/UI/Modal';
 import Input from '@/components/UI/Input';
 import Button from '@/components/UI/Button';
@@ -47,8 +47,12 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
 
   const updateStudentMutation = useMutation({
     mutationFn: async (data: any) => {
-      // Mock update - replace with actual API call
-      return new Promise((resolve) => setTimeout(resolve, 500));
+      const studentData = {
+        ...data,
+        parentName: data.guardianName, // Map back to API format
+        parentPhone: data.guardianPhone,
+      };
+      return updateStudent(studentData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students'] });

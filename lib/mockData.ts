@@ -233,6 +233,7 @@ export let teachers: Teacher[] = [
     address: '100 Teacher Lane, Springfield',
     fatherName: 'James Smith',
     motherName: 'Mary Smith',
+    classes: ['10A', '10B', '11C'],
   },
   {
     id: 't2',

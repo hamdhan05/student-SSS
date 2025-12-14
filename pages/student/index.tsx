@@ -1,7 +1,7 @@
 import { useRequireAuth } from '@/lib/hooks/useAuth';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getStudentById, getAttendanceByStudent, createComplaint } from '@/lib/api';
+import { getStudentById, getAttendanceByStudent, createComplaint, getNotices } from '@/lib/api';
 import Button from '@/components/UI/Button';
 import Input from '@/components/UI/Input';
 import Modal from '@/components/UI/Modal';
@@ -10,7 +10,7 @@ import Layout from '@/components/UI/Layout';
 export default function StudentPortal() {
   const { user, loading } = useRequireAuth(['student']);
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'academics' | 'attendance' | 'complaints'>('academics');
+  const [activeTab, setActiveTab] = useState<'academics' | 'timetable' | 'attendance' | 'complaints' | 'notices'>('academics');
   const [isComplaintModalOpen, setIsComplaintModalOpen] = useState(false);
   const [complaintData, setComplaintData] = useState({ title: '', description: '' });
 
@@ -25,6 +25,11 @@ export default function StudentPortal() {
   const { data: attendance = [] } = useQuery({
     queryKey: ['attendance', studentId],
     queryFn: () => getAttendanceByStudent(studentId),
+  });
+
+  const { data: notices = [] } = useQuery({
+    queryKey: ['notices'],
+    queryFn: getNotices,
   });
 
   const createComplaintMutation = useMutation({
@@ -59,7 +64,9 @@ export default function StudentPortal() {
 
   const tabs = [
     { id: 'academics' as const, label: 'Academics', icon: '📚' },
-    { id: 'attendance' as const, label: 'Attendance', icon: '📅' },
+    { id: 'timetable' as const, label: 'Timetable', icon: '📅' },
+    { id: 'attendance' as const, label: 'Attendance', icon: '📊' },
+    { id: 'notices' as const, label: 'Notices', icon: '📢' },
     { id: 'complaints' as const, label: 'Submit Complaint', icon: '📝' },
   ];
 
@@ -128,6 +135,55 @@ export default function StudentPortal() {
         </div>
       )}
 
+
+
+      {activeTab === 'timetable' && (
+        <div className="card p-6 overflow-x-auto">
+          <h2 className="text-3xl font-bold text-white mb-6">Weekly Timetable</h2>
+          <div className="min-w-full inline-block align-middle">
+            <div className="border border-gray-700 rounded-lg overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-700">
+                <thead>
+                  <tr className="bg-black bg-opacity-30">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider border-r border-gray-700">Time</th>
+                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => (
+                      <th key={day} className="px-6 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider border-r border-gray-700 last:border-r-0">{day}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-700">
+                  {['09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00', '12:00 - 01:00', '01:00 - 02:00', '02:00 - 03:00'].map((time, i) => (
+                    <tr key={time} className={i % 2 === 0 ? 'bg-white bg-opacity-5' : ''}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300 border-r border-gray-700">{time}</td>
+                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day, j) => {
+                        // Mock schedule logic
+                        const subjects = ['Mathematics', 'Science', 'English', 'History', 'Geography', 'Physics', 'Chemistry'];
+                        const subjectIndex = (i + j) % subjects.length;
+                        const subject = subjects[subjectIndex];
+                        const isBreak = i === 3; // Lunch break at 12:00
+
+                        return (
+                          <td key={day} className="px-6 py-4 whitespace-nowrap text-center border-r border-gray-700 last:border-r-0">
+                            {isBreak ? (
+                              <span className="text-gray-500 italic">Lunch Break</span>
+                            ) : (
+                              <div className="inline-flex flex-col items-center justify-center px-3 py-1 rounded-md bg-purple-500 bg-opacity-20 border border-purple-500 border-opacity-30 text-purple-200">
+                                <span className="font-bold">{subject}</span>
+                                <span className="text-xs opacity-75">Room {101 + i}</span>
+                              </div>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
       {activeTab === 'attendance' && (
         <div className="space-y-6">
           <h2 className="text-3xl font-bold text-white">Attendance Record</h2>
@@ -183,6 +239,29 @@ export default function StudentPortal() {
 
             {attendance.length === 0 && (
               <div className="p-8 text-center text-gray-400">No attendance records available</div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'notices' && (
+        <div className="space-y-6">
+          <h2 className="text-3xl font-bold text-white">Notice Board</h2>
+          <div className="space-y-4">
+            {notices.map((notice: any) => (
+              <div key={notice.id} className="card p-6 border-l-4 border-blue-500">
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-xl font-bold text-white">{notice.title}</h3>
+                  <span className="text-sm text-gray-400">
+                    {new Date(notice.date || notice.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+                <p className="text-gray-300 whitespace-pre-wrap">{notice.content}</p>
+                <div className="mt-4 text-xs text-gray-500">Posted by: {notice.createdBy}</div>
+              </div>
+            ))}
+            {notices.length === 0 && (
+              <div className="card p-8 text-center text-gray-400">No notices available</div>
             )}
           </div>
         </div>

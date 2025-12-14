@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { teachers, students } from '../mockData';
 
 export type UserRole = 'headmaster' | 'teacher' | 'student' | null;
 
@@ -25,26 +26,40 @@ export function useAuth() {
     setLoading(false);
   }, []);
 
+
+
   const signIn = async (email: string, password: string) => {
-    // Mock role detection based on email
     let role: UserRole = null;
     let name = '';
     let id = '';
 
-    if (email.toLowerCase().includes('headmaster')) {
+    // Check for Headmaster
+    if (email === 'headmaster@school.com') {
       role = 'headmaster';
       name = 'Headmaster Admin';
       id = 'headmaster_1';
-    } else if (email.toLowerCase().includes('teacher')) {
-      role = 'teacher';
-      name = 'Teacher User';
-      id = 'teacher_1';
-    } else if (email.toLowerCase().includes('student')) {
-      role = 'student';
-      name = 'Student User';
-      id = 'student_1';
-    } else {
-      throw new Error('Invalid email format. Use headmaster@, teacher@, or student@ in email.');
+    }
+    // Check for Teacher
+    else {
+      const teacher = teachers.find(t => t.email.toLowerCase() === email.toLowerCase());
+      if (teacher) {
+        role = 'teacher';
+        name = teacher.name;
+        id = teacher.id;
+      }
+      // Check for Student
+      else {
+        const student = students.find(s => s.email.toLowerCase() === email.toLowerCase());
+        if (student) {
+          role = 'student';
+          name = student.name;
+          id = student.id;
+        }
+      }
+    }
+
+    if (!role) {
+      throw new Error('Invalid credentials. User not found.');
     }
 
     const authUser: AuthUser = { id, email, name, role };

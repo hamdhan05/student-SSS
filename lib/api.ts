@@ -114,7 +114,6 @@ export const getStudentById = async (id: string) => {
       lastPaymentDate: null,
       lastPaymentAmount: 0,
     },
-    academics,
     attendance,
     attendancePercentage,
   };
@@ -126,7 +125,7 @@ export const getTeachers = async () => {
   return teachers.map(t => ({
     ...t,
     subject: t.domain,
-    classes: ['9A', '9B', '10A'], // Mock classes
+    classes: t.classes || [],
   }));
 };
 
@@ -147,6 +146,26 @@ export const getTeacherById = async (id: string) => {
   const teacher = teachers.find(t => t.id === id);
   if (!teacher) throw new Error('Teacher not found');
   return teacher;
+};
+
+export const updateStudent = async (student: Student) => {
+  await delay();
+  const index = students.findIndex((s) => s.id === student.id);
+  if (index !== -1) {
+    students[index] = student;
+    return student;
+  }
+  throw new Error('Student not found');
+};
+
+export const updateTeacher = async (teacher: Teacher) => {
+  await delay();
+  const index = teachers.findIndex((t) => t.id === teacher.id);
+  if (index !== -1) {
+    teachers[index] = teacher;
+    return teacher;
+  }
+  throw new Error('Teacher not found');
 };
 
 // Notices
@@ -334,5 +353,7 @@ export default {
   markAttendanceBatch,
   getAcademicsByStudent,
   createStudent,
+  updateStudent,
   createTeacher,
+  updateTeacher,
 };

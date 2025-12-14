@@ -95,6 +95,20 @@ export default function TeacherDetailModal({
                                     <p className="text-gray-400 text-sm mb-1">Mother Name</p>
                                     <p className="text-white font-medium">{teacher.motherName}</p>
                                 </div>
+                                <div>
+                                    <p className="text-gray-400 text-sm mb-1">Classes Assigned</p>
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                        {teacher.classes && teacher.classes.length > 0 ? (
+                                            teacher.classes.map((cls: string) => (
+                                                <span key={cls} className="px-2 py-1 bg-blue-500 bg-opacity-20 text-blue-300 rounded text-xs font-medium border border-blue-500 border-opacity-30">
+                                                    {cls}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <span className="text-gray-500 text-sm italic">No classes assigned</span>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

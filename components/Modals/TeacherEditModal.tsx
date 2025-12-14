@@ -1,18 +1,20 @@
-import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createTeacher } from '@/lib/api';
+import { useState, useEffect } from 'react';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { updateTeacher, getTeacherById } from '@/lib/api';
 import Modal from '@/components/UI/Modal';
 import Input from '@/components/UI/Input';
 import Button from '@/components/UI/Button';
 
-interface AddTeacherModalProps {
+interface TeacherEditModalProps {
     isOpen: boolean;
     onClose: () => void;
+    teacherId: string;
 }
 
-export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProps) {
+export default function TeacherEditModal({ isOpen, onClose, teacherId }: TeacherEditModalProps) {
     const queryClient = useQueryClient();
     const [formData, setFormData] = useState({
+        id: '',
         name: '',
         email: '',
         phone: '',
@@ -24,10 +26,39 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
         fatherName: '',
         motherName: '',
         classes: [] as string[],
+        joiningDate: '',
+        photo: '',
     });
 
     const [currentClass, setCurrentClass] = useState('10');
     const [currentSection, setCurrentSection] = useState('A');
+
+    const { data: teacher, isLoading } = useQuery({
+        queryKey: ['teacher', teacherId],
+        queryFn: () => getTeacherById(teacherId),
+        enabled: isOpen && !!teacherId,
+    });
+
+    useEffect(() => {
+        if (teacher) {
+            setFormData({
+                id: teacher.id,
+                name: teacher.name,
+                email: teacher.email,
+                phone: teacher.phone,
+                dateOfBirth: teacher.dateOfBirth,
+                address: teacher.address,
+                domain: teacher.domain,
+                qualification: teacher.qualification,
+                experience: teacher.experience,
+                fatherName: teacher.fatherName,
+                motherName: teacher.motherName,
+                classes: teacher.classes || [],
+                joiningDate: teacher.joiningDate,
+                photo: teacher.photo,
+            });
+        }
+    }, [teacher]);
 
     const addClass = () => {
         const classString = `${currentClass}${currentSection}`;
@@ -46,35 +77,19 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
         }));
     };
 
-    const createTeacherMutation = useMutation({
-        mutationFn: (data: typeof formData) => createTeacher({
-            ...data,
-            photo: '/images/teachers/default.jpg'
-        }),
+    const updateTeacherMutation = useMutation({
+        mutationFn: updateTeacher,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['teachers'] });
-            alert('Teacher added successfully!');
+            queryClient.invalidateQueries({ queryKey: ['teacher', teacherId] });
+            alert('Teacher updated successfully!');
             onClose();
-            // Reset form
-            setFormData({
-                name: '',
-                email: '',
-                phone: '',
-                dateOfBirth: '',
-                address: '',
-                domain: '',
-                qualification: '',
-                experience: '',
-                fatherName: '',
-                motherName: '',
-                classes: [],
-            });
         },
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        createTeacherMutation.mutate(formData);
+        updateTeacherMutation.mutate(formData);
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -86,8 +101,16 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
 
     if (!isOpen) return null;
 
+    if (isLoading) {
+        return (
+            <Modal isOpen={isOpen} onClose={onClose} title="Edit Teacher">
+                <div className="text-center py-8 text-gray-400">Loading...</div>
+            </Modal>
+        );
+    }
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Add New Teacher">
+        <Modal isOpen={isOpen} onClose={onClose} title="Edit Teacher">
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Personal Information */}
                 <div className="bg-white bg-opacity-5 p-6 rounded-xl border border-gray-700">
@@ -113,7 +136,6 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 value={formData.domain}
                                 onChange={handleChange}
                                 required
-                                placeholder="e.g. Mathematics"
                                 className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
@@ -186,7 +208,6 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 value={formData.experience}
                                 onChange={handleChange}
                                 required
-                                placeholder="e.g. 5 years"
                                 className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
@@ -283,13 +304,13 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                     </Button>
                     <Button
                         type="submit"
-                        disabled={createTeacherMutation.isPending}
+                        disabled={updateTeacherMutation.isPending}
                         className="bg-white text-black hover:bg-gray-200"
                     >
-                        {createTeacherMutation.isPending ? 'Adding...' : 'Add Teacher'}
+                        {updateTeacherMutation.isPending ? 'Saving...' : 'Save Changes'}
                     </Button>
                 </div>
             </form>
-        </Modal >
+        </Modal>
     );
 }
