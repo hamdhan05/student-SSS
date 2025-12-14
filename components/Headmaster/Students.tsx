@@ -5,6 +5,7 @@ import Button from '@/components/UI/Button';
 import Input from '@/components/UI/Input';
 import StudentDetailModal from '@/components/Modals/StudentDetailModal';
 import StudentEditModal from '@/components/Modals/StudentEditModal';
+import AddStudentModal from '@/components/Modals/AddStudentModal';
 
 export default function Students() {
   const [page, setPage] = useState(1);
@@ -13,6 +14,7 @@ export default function Students() {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewStudentId, setViewStudentId] = useState<string | null>(null);
   const [editStudentId, setEditStudentId] = useState<string | null>(null);
+  const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
 
   // Fetch classes
   const { data: classes = [] } = useQuery({
@@ -50,7 +52,12 @@ export default function Students() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold text-white">Students</h2>
-        <Button className="bg-white text-black hover:bg-gray-200">Add Student</Button>
+        <Button
+          className="bg-white text-black hover:bg-gray-200"
+          onClick={() => setIsAddStudentModalOpen(true)}
+        >
+          Add Student
+        </Button>
       </div>
 
       {/* Filters */}
@@ -201,6 +208,11 @@ export default function Students() {
           studentId={editStudentId}
         />
       )}
+
+      <AddStudentModal
+        isOpen={isAddStudentModalOpen}
+        onClose={() => setIsAddStudentModalOpen(false)}
+      />
     </div>
   );
 }

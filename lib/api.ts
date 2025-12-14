@@ -42,32 +42,32 @@ export const getStudents = async (params?: {
   q?: string;
 }) => {
   await delay();
-  
+
   let filtered = [...students];
-  
+
   if (params?.classId) {
     const classStr = params.classId.toString();
     filtered = filtered.filter(s => s.class === classStr);
   }
-  
+
   if (params?.section) {
     filtered = filtered.filter(s => s.section === params.section);
   }
-  
+
   if (params?.q) {
     const query = params.q.toLowerCase();
-    filtered = filtered.filter(s => 
+    filtered = filtered.filter(s =>
       s.name.toLowerCase().includes(query) ||
       s.rollNumber.includes(query) ||
       s.email.toLowerCase().includes(query)
     );
   }
-  
+
   const page = params?.page || 1;
   const limit = params?.limit || 10;
   const start = (page - 1) * limit;
   const end = start + limit;
-  
+
   return {
     data: filtered.slice(start, end),
     total: filtered.length,
@@ -76,20 +76,32 @@ export const getStudents = async (params?: {
   };
 };
 
+export const createStudent = async (student: Omit<Student, 'id' | 'admissionDate'>) => {
+  await delay();
+  const newStudent: Student = {
+    ...student,
+    id: `s${Date.now()}`,
+    admissionDate: new Date().toISOString().split('T')[0],
+    photo: '/images/students/default.jpg',
+  };
+  students.push(newStudent);
+  return newStudent;
+};
+
 export const getStudentById = async (id: string) => {
   await delay();
   const student = students.find(s => s.id === id);
   if (!student) throw new Error('Student not found');
-  
+
   const fees = feeRecords.find(f => f.studentId === id);
   const academics = academicRecords.filter(a => a.studentId === id);
   const attendance = attendanceRecords.filter(a => a.studentId === id);
-  
+
   // Calculate attendance percentage
   const totalDays = attendance.length;
   const presentDays = attendance.filter(a => a.status === 'present').length;
   const attendancePercentage = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
-  
+
   return {
     ...student,
     guardianName: student.parentName,
@@ -116,6 +128,18 @@ export const getTeachers = async () => {
     subject: t.domain,
     classes: ['9A', '9B', '10A'], // Mock classes
   }));
+};
+
+export const createTeacher = async (teacher: Omit<Teacher, 'id' | 'joiningDate'>) => {
+  await delay();
+  const newTeacher: Teacher = {
+    ...teacher,
+    id: `t${Date.now()}`,
+    joiningDate: new Date().toISOString().split('T')[0],
+    photo: '/images/teachers/default.jpg',
+  };
+  teachers.push(newTeacher);
+  return newTeacher;
 };
 
 export const getTeacherById = async (id: string) => {
@@ -178,22 +202,22 @@ export const getFees = async (studentId: string) => {
 export const getStudentFees = async (params: { classId?: string; section?: string; q?: string }) => {
   await delay();
   let filtered = [...students];
-  
+
   if (params.classId) {
     filtered = filtered.filter(s => s.class === params.classId);
   }
-  
+
   if (params.section) {
     filtered = filtered.filter(s => s.section === params.section);
   }
-  
+
   if (params.q) {
     const query = params.q.toLowerCase();
-    filtered = filtered.filter(s => 
+    filtered = filtered.filter(s =>
       s.name.toLowerCase().includes(query) || s.rollNumber.includes(query)
     );
   }
-  
+
   return filtered.map(student => {
     const fees = feeRecords.find(f => f.studentId === student.id) || {
       totalFee: 50000,
@@ -202,7 +226,7 @@ export const getStudentFees = async (params: { classId?: string; section?: strin
       lastPaymentDate: null,
       lastPaymentAmount: 0,
     };
-    
+
     return {
       student,
       fees,
@@ -258,16 +282,16 @@ export const markAttendanceBatch = async (params: {
   marks: Array<{ studentId: string; status: 'present' | 'absent' | 'late' | 'excused' }>;
 }) => {
   await delay();
-  
+
   // Remove existing attendance for this date and class/section
   const studentsInClass = students.filter(
     s => s.class === params.classId && s.section === params.section
   ).map(s => s.id);
-  
+
   const filtered = attendanceRecords.filter(
     a => !(studentsInClass.includes(a.studentId) && a.date === params.date)
   );
-  
+
   // Add new attendance records
   const newRecords = params.marks.map(mark => ({
     id: `a${Date.now()}_${mark.studentId}`,
@@ -275,10 +299,10 @@ export const markAttendanceBatch = async (params: {
     date: params.date,
     status: mark.status,
   }));
-  
+
   attendanceRecords.length = 0;
   attendanceRecords.push(...filtered, ...newRecords);
-  
+
   return { success: true, recordsAdded: newRecords.length };
 };
 
@@ -309,4 +333,6 @@ export default {
   getAttendanceByStudent,
   markAttendanceBatch,
   getAcademicsByStudent,
+  createStudent,
+  createTeacher,
 };

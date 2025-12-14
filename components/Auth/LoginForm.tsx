@@ -27,7 +27,7 @@ export default function LoginForm() {
   return (
     <div className="w-full max-w-md">
       {/* Glassmorphism Container Box */}
-      <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl border border-white border-opacity-20 shadow-2xl p-8">
+      <div className="bg-black bg-opacity-40 backdrop-blur-lg rounded-2xl border border-white border-opacity-10 shadow-2xl p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="text-center mb-8">
             <h2 className="text-4xl font-bold text-white mb-2">Login</h2>

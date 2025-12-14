@@ -3,9 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import { getTeachers } from '@/lib/api';
 import Button from '@/components/UI/Button';
 import Input from '@/components/UI/Input';
+import AddTeacherModal from '@/components/Modals/AddTeacherModal';
+import TeacherDetailModal from '@/components/Modals/TeacherDetailModal';
 
 export default function Teachers() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isAddTeacherModalOpen, setIsAddTeacherModalOpen] = useState(false);
+  const [viewTeacherId, setViewTeacherId] = useState<string | null>(null);
 
   const { data: teachers = [], isLoading } = useQuery({
     queryKey: ['teachers'],
@@ -15,9 +19,9 @@ export default function Teachers() {
   const filteredTeachers = teachers.filter((teacher) =>
     searchQuery
       ? teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        teacher.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (teacher.subject && teacher.subject.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (teacher.domain && teacher.domain.toLowerCase().includes(searchQuery.toLowerCase()))
+      teacher.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (teacher.subject && teacher.subject.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (teacher.domain && teacher.domain.toLowerCase().includes(searchQuery.toLowerCase()))
       : true
   );
 
@@ -25,7 +29,12 @@ export default function Teachers() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold text-white">Teachers</h2>
-        <Button className="bg-white text-black hover:bg-gray-200">Add Teacher</Button>
+        <Button
+          className="bg-white text-black hover:bg-gray-200"
+          onClick={() => setIsAddTeacherModalOpen(true)}
+        >
+          Add Teacher
+        </Button>
       </div>
 
       {/* Search */}
@@ -68,7 +77,10 @@ export default function Teachers() {
               </div>
 
               <div className="flex gap-2 mt-4">
-                <button className="flex-1 px-4 py-2 bg-white text-black rounded hover:bg-gray-200 text-sm font-medium">
+                <button
+                  onClick={() => setViewTeacherId(teacher.id)}
+                  className="flex-1 px-4 py-2 bg-white text-black rounded hover:bg-gray-200 text-sm font-medium"
+                >
                   View Details
                 </button>
                 <button className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm">
@@ -84,6 +96,19 @@ export default function Teachers() {
         <div className="card p-8 text-center text-gray-400">
           No teachers found matching your search.
         </div>
+      )}
+
+      <AddTeacherModal
+        isOpen={isAddTeacherModalOpen}
+        onClose={() => setIsAddTeacherModalOpen(false)}
+      />
+
+      {viewTeacherId && (
+        <TeacherDetailModal
+          isOpen={!!viewTeacherId}
+          onClose={() => setViewTeacherId(null)}
+          teacherId={viewTeacherId}
+        />
       )}
     </div>
   );

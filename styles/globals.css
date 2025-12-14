@@ -41,11 +41,10 @@ body::before {
   filter: blur(6px) brightness(0.45);
 }
 
-/* Light Mode: Lighten/White tint and Blur */
+/* Light Mode: Darkened Blur (matching dark mode style) */
 body:not(.dark)::before {
-  filter: blur(8px) brightness(1.1);
-  background-color: rgba(255, 255, 255, 0.3);
-  /* More transparent to show image */
+  filter: blur(6px) brightness(0.6);
+  background-color: transparent;
 }
 
 /* Ensure all containers have proper layering */

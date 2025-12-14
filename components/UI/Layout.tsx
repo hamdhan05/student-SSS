@@ -104,11 +104,11 @@ export default function Layout({
       >
         <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center md:block">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-white hidden md:block">{title}</h1>
+            <h1 className="text-2xl font-bold text-black dark:text-white hidden md:block">{title}</h1>
             {user && (
               <>
-                <div className="md:hidden text-xl font-bold text-gray-800 dark:text-white mb-1">{title} Menu</div>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{user.name}</p>
+                <div className="md:hidden text-xl font-bold text-black dark:text-white mb-1">{title} Menu</div>
+                <p className="text-black dark:text-gray-400 text-sm mt-1">{user.name}</p>
               </>
             )}
           </div>
@@ -139,8 +139,8 @@ export default function Layout({
                     closeSidebar();
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded transition-colors ${activeTab === tab.id
-                    ? 'bg-black bg-opacity-20 text-black font-bold dark:bg-white dark:bg-opacity-20 dark:text-white shadow-inner'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-black hover:bg-opacity-5 dark:hover:bg-white dark:hover:bg-opacity-10'
+                    ? 'bg-black text-white font-bold dark:bg-white dark:bg-opacity-20 dark:text-white shadow-inner'
+                    : 'text-black dark:text-gray-400 hover:bg-black hover:bg-opacity-5 dark:hover:bg-white dark:hover:bg-opacity-10'
                     }`}
                 >
                   <span className="text-xl">{tab.icon}</span>
@@ -179,7 +179,7 @@ export default function Layout({
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto bg-gray-50 dark:bg-black dark:bg-opacity-50 min-h-[calc(100vh-64px)] md:min-h-screen w-full transition-colors duration-300">
+      <main className="flex-1 overflow-auto bg-white bg-opacity-60 dark:bg-black dark:bg-opacity-50 min-h-[calc(100vh-64px)] md:min-h-screen w-full transition-colors duration-300">
         <div className="p-4 md:p-8 w-full max-w-7xl mx-auto">
           {children}
         </div>
