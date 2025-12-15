@@ -56,6 +56,23 @@ export interface Holiday {
   type: string;
 }
 
+export interface TermFee {
+  name: string;
+  amount: number;
+  status: 'paid' | 'pending' | 'overdue';
+}
+
+export interface Notification {
+  id: string;
+  studentId: string;
+  type: 'sms' | 'call';
+  message: string;
+  status: 'sent';
+  timestamp: string;
+}
+
+export const notifications: Notification[] = [];
+
 export interface FeeRecord {
   id: string;
   studentId: string;
@@ -71,6 +88,19 @@ export interface FeeRecord {
   month?: string;
   amount?: number;
   status?: 'paid' | 'pending';
+  terms?: TermFee[];
+}
+
+export interface Homework {
+  id: string;
+  class: string;
+  section: string;
+  subject: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  createdBy: string;
+  createdAt: string;
 }
 
 export interface Complaint {
@@ -338,6 +368,11 @@ export let feeRecords: FeeRecord[] = [
     dueAmount: 15000,
     lastPaymentDate: '2025-11-15',
     lastPaymentAmount: 10000,
+    terms: [
+      { name: 'Term 1', amount: 20000, status: 'paid' },
+      { name: 'Term 2', amount: 15000, status: 'paid' },
+      { name: 'Term 3', amount: 15000, status: 'pending' },
+    ]
   },
   {
     id: 'f2',
@@ -347,6 +382,11 @@ export let feeRecords: FeeRecord[] = [
     dueAmount: 0,
     lastPaymentDate: '2025-10-20',
     lastPaymentAmount: 15000,
+    terms: [
+      { name: 'Term 1', amount: 20000, status: 'paid' },
+      { name: 'Term 2', amount: 15000, status: 'paid' },
+      { name: 'Term 3', amount: 15000, status: 'paid' },
+    ]
   },
   {
     id: 'f3',
@@ -356,6 +396,36 @@ export let feeRecords: FeeRecord[] = [
     dueAmount: 25000,
     lastPaymentDate: '2025-09-10',
     lastPaymentAmount: 12500,
+    terms: [
+      { name: 'Term 1', amount: 20000, status: 'paid' },
+      { name: 'Term 2', amount: 15000, status: 'pending' },
+      { name: 'Term 3', amount: 15000, status: 'pending' },
+    ]
+  },
+];
+
+export let homeworks: Homework[] = [
+  {
+    id: 'hw1',
+    class: '10',
+    section: 'A',
+    subject: 'Mathematics',
+    title: 'Quadratic Equations Exercise',
+    description: 'Complete exercises 4.1 to 4.3 from the textbook. Show all working steps.',
+    dueDate: '2025-12-20',
+    createdBy: 't1',
+    createdAt: '2025-12-14',
+  },
+  {
+    id: 'hw2',
+    class: '10',
+    section: 'A',
+    subject: 'English',
+    title: 'Essay Writing',
+    description: 'Write an essay on "The Impact of Technology on Education" (500 words).',
+    dueDate: '2025-12-18',
+    createdBy: 't2',
+    createdAt: '2025-12-14',
   },
 ];
 

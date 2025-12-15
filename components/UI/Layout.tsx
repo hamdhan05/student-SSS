@@ -106,10 +106,22 @@ export default function Layout({
           <div>
             <h1 className="text-2xl font-bold text-black dark:text-white hidden md:block">{title}</h1>
             {user && (
-              <>
-                <div className="md:hidden text-xl font-bold text-black dark:text-white mb-1">{title} Menu</div>
-                <p className="text-black dark:text-gray-400 text-sm mt-1">{user.name}</p>
-              </>
+              <div className="flex items-center gap-3 mb-6 md:mb-0">
+                <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 overflow-hidden flex-shrink-0 border border-gray-400 dark:border-gray-600 flex items-center justify-center">
+                  {user.photo ? (
+                    <img src={user.photo} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                      {user.name.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <div className="md:hidden text-xl font-bold text-black dark:text-white mb-1">{title} Menu</div>
+                  <p className="text-black dark:text-gray-300 text-sm font-medium">{user.name}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs capitalize">{user.role}</p>
+                </div>
+              </div>
             )}
           </div>
           <button onClick={closeSidebar} className="md:hidden text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white">

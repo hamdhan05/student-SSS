@@ -240,13 +240,13 @@ export default function TeacherEditModal({ isOpen, onClose, teacherId }: Teacher
                         <span className="p-2 bg-orange-500 bg-opacity-20 rounded-lg text-orange-400">📚</span>
                         Assign Classes
                     </h3>
-                    <div className="flex gap-4 items-end mb-4">
+                    <div className="flex gap-4 items-end mb-6">
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-gray-300 mb-2">Class</label>
                             <select
                                 value={currentClass}
                                 onChange={(e) => setCurrentClass(e.target.value)}
-                                className="w-full px-4 py-2 rounded-lg bg-white bg-opacity-10 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+                                className="w-full px-4 py-3 rounded-lg bg-white bg-opacity-10 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
                             >
                                 {[...Array(12)].map((_, i) => (
                                     <option key={i + 1} value={i + 1} className="bg-gray-900">{i + 1}</option>
@@ -258,7 +258,7 @@ export default function TeacherEditModal({ isOpen, onClose, teacherId }: Teacher
                             <select
                                 value={currentSection}
                                 onChange={(e) => setCurrentSection(e.target.value)}
-                                className="w-full px-4 py-2 rounded-lg bg-white bg-opacity-10 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+                                className="w-full px-4 py-3 rounded-lg bg-white bg-opacity-10 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
                             >
                                 {['A', 'B', 'C', 'D'].map((sec) => (
                                     <option key={sec} value={sec} className="bg-gray-900">{sec}</option>
@@ -268,27 +268,33 @@ export default function TeacherEditModal({ isOpen, onClose, teacherId }: Teacher
                         <Button
                             type="button"
                             onClick={addClass}
-                            className="bg-gray-700 hover:bg-gray-600 text-white"
+                            className="bg-green-600 hover:bg-green-500 text-white px-8 py-3 h-[48px] font-bold shadow-lg"
                         >
-                            Add
+                            + ADD CLASS
                         </Button>
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
+                    <div className="mb-2 text-sm text-gray-400">Assigned Classes:</div>
+                    <div className="flex flex-wrap gap-3 p-4 bg-black bg-opacity-20 rounded-lg min-h-[60px]">
                         {formData.classes.map((cls) => (
-                            <div key={cls} className="flex items-center gap-2 px-3 py-1 bg-black bg-opacity-30 rounded-full border border-gray-600">
-                                <span className="text-white text-sm font-medium">{cls}</span>
+                            <div key={cls} className="flex items-center gap-3 pl-4 pr-2 py-2 bg-blue-600 bg-opacity-20 border border-blue-500 rounded-lg shadow-sm">
+                                <span className="text-blue-100 font-bold text-base">{cls}</span>
                                 <button
                                     type="button"
                                     onClick={() => removeClass(cls)}
-                                    className="text-gray-400 hover:text-white"
+                                    className="p-1 hover:bg-red-500 hover:text-white text-gray-400 rounded-full transition-colors"
+                                    title="Remove class"
                                 >
-                                    ×
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                    </svg>
                                 </button>
                             </div>
                         ))}
                         {formData.classes.length === 0 && (
-                            <p className="text-gray-500 text-sm italic">No classes assigned yet.</p>
+                            <div className="w-full flex items-center justify-center text-gray-500 italic">
+                                No classes assigned yet. Use the controls above to add classes.
+                            </div>
                         )}
                     </div>
                 </div>

@@ -6,11 +6,12 @@ import Button from '@/components/UI/Button';
 import Input from '@/components/UI/Input';
 import Modal from '@/components/UI/Modal';
 import Layout from '@/components/UI/Layout';
+import StudentHomework from '@/components/Student/Homework';
 
 export default function StudentPortal() {
   const { user, loading } = useRequireAuth(['student']);
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'academics' | 'timetable' | 'attendance' | 'complaints' | 'notices'>('academics');
+  const [activeTab, setActiveTab] = useState<'academics' | 'timetable' | 'homework' | 'attendance' | 'complaints' | 'notices'>('academics');
   const [isComplaintModalOpen, setIsComplaintModalOpen] = useState(false);
   const [complaintData, setComplaintData] = useState({ title: '', description: '' });
 
@@ -65,6 +66,7 @@ export default function StudentPortal() {
   const tabs = [
     { id: 'academics' as const, label: 'Academics', icon: '📚' },
     { id: 'timetable' as const, label: 'Timetable', icon: '📅' },
+    { id: 'homework' as const, label: 'Homework', icon: '📝' },
     { id: 'attendance' as const, label: 'Attendance', icon: '📊' },
     { id: 'notices' as const, label: 'Notices', icon: '📢' },
     { id: 'complaints' as const, label: 'Submit Complaint', icon: '📝' },
@@ -184,125 +186,139 @@ export default function StudentPortal() {
         </div>
       )}
 
-      {activeTab === 'attendance' && (
-        <div className="space-y-6">
-          <h2 className="text-3xl font-bold text-white">Attendance Record</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="card p-6">
-              <h3 className="text-sm text-gray-400 mb-2">Total Days</h3>
-              <p className="text-3xl font-bold text-white">{totalDays}</p>
-            </div>
-            <div className="card p-6 border-green-600">
-              <h3 className="text-sm text-gray-400 mb-2">Days Present</h3>
-              <p className="text-3xl font-bold text-green-400">{presentCount}</p>
-            </div>
-            <div className="card p-6">
-              <h3 className="text-sm text-gray-400 mb-2">Attendance %</h3>
-              <p className="text-3xl font-bold text-white">{attendancePercentage}%</p>
-            </div>
-          </div>
 
-          <div className="card overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-700">
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">Date</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-white">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {attendance.map((record: any) => (
-                  <tr key={record.id} className="border-b border-gray-800 hover:bg-white hover:bg-opacity-5">
-                    <td className="px-6 py-4 text-sm text-gray-300">
-                      {new Date(record.date).toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${record.status === 'present'
-                          ? 'bg-green-900 bg-opacity-50 text-green-400'
-                          : 'bg-red-900 bg-opacity-50 text-red-400'
-                          }`}
-                      >
-                        {record.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {
+        activeTab === 'homework' && student && (
+          <StudentHomework student={student} />
+        )
+      }
 
-            {attendance.length === 0 && (
-              <div className="p-8 text-center text-gray-400">No attendance records available</div>
-            )}
-          </div>
-        </div>
-      )}
+      {
+        activeTab === 'attendance' && (
+          <div className="space-y-6">
+            <h2 className="text-3xl font-bold text-white">Attendance Record</h2>
 
-      {activeTab === 'notices' && (
-        <div className="space-y-6">
-          <h2 className="text-3xl font-bold text-white">Notice Board</h2>
-          <div className="space-y-4">
-            {notices.map((notice: any) => (
-              <div key={notice.id} className="card p-6 border-l-4 border-blue-500">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xl font-bold text-white">{notice.title}</h3>
-                  <span className="text-sm text-gray-400">
-                    {new Date(notice.date || notice.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                <p className="text-gray-300 whitespace-pre-wrap">{notice.content}</p>
-                <div className="mt-4 text-xs text-gray-500">Posted by: {notice.createdBy}</div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="card p-6">
+                <h3 className="text-sm text-gray-400 mb-2">Total Days</h3>
+                <p className="text-3xl font-bold text-white">{totalDays}</p>
               </div>
-            ))}
-            {notices.length === 0 && (
-              <div className="card p-8 text-center text-gray-400">No notices available</div>
-            )}
-          </div>
-        </div>
-      )}
+              <div className="card p-6 border-green-600">
+                <h3 className="text-sm text-gray-400 mb-2">Days Present</h3>
+                <p className="text-3xl font-bold text-green-400">{presentCount}</p>
+              </div>
+              <div className="card p-6">
+                <h3 className="text-sm text-gray-400 mb-2">Attendance %</h3>
+                <p className="text-3xl font-bold text-white">{attendancePercentage}%</p>
+              </div>
+            </div>
 
-      {activeTab === 'complaints' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-bold text-white">Submit a Complaint</h2>
-            <Button
-              onClick={() => setIsComplaintModalOpen(true)}
-              className="bg-white text-black hover:bg-gray-200"
-            >
-              New Complaint
-            </Button>
-          </div>
+            <div className="card overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-700">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Date</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-white">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {attendance.map((record: any) => (
+                    <tr key={record.id} className="border-b border-gray-800 hover:bg-white hover:bg-opacity-5">
+                      <td className="px-6 py-4 text-sm text-gray-300">
+                        {new Date(record.date).toLocaleDateString('en-US', {
+                          weekday: 'short',
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${record.status === 'present'
+                            ? 'bg-green-900 bg-opacity-50 text-green-400'
+                            : 'bg-red-900 bg-opacity-50 text-red-400'
+                            }`}
+                        >
+                          {record.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
 
-          <div className="card p-6 bg-yellow-900 bg-opacity-20 border-yellow-600">
-            <h3 className="text-lg font-semibold text-yellow-400 mb-2">📢 Anonymous Submission</h3>
-            <p className="text-gray-300">
-              Your complaints will be submitted anonymously. The headmaster will not be able to see your identity,
-              ensuring you can report issues freely without any concerns.
-            </p>
+              {attendance.length === 0 && (
+                <div className="p-8 text-center text-gray-400">No attendance records available</div>
+              )}
+            </div>
           </div>
+        )
+      }
 
-          <div className="card p-8 text-center">
-            <div className="text-6xl mb-4">📝</div>
-            <h3 className="text-xl font-semibold text-white mb-2">Have a concern?</h3>
-            <p className="text-gray-400 mb-6">
-              Submit your complaints anonymously. We take all feedback seriously and work to resolve issues
-              promptly.
-            </p>
-            <Button
-              onClick={() => setIsComplaintModalOpen(true)}
-              className="bg-white text-black hover:bg-gray-200"
-            >
-              Submit Complaint
-            </Button>
+      {
+        activeTab === 'notices' && (
+          <div className="space-y-6">
+            <h2 className="text-3xl font-bold text-white">Notice Board</h2>
+            <div className="space-y-4">
+              {notices.map((notice: any) => (
+                <div key={notice.id} className="card p-6 border-l-4 border-blue-500">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-xl font-bold text-white">{notice.title}</h3>
+                    <span className="text-sm text-gray-400">
+                      {new Date(notice.date || notice.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="text-gray-300 whitespace-pre-wrap">{notice.content}</p>
+                  <div className="mt-4 text-xs text-gray-500">Posted by: {notice.createdBy}</div>
+                </div>
+              ))}
+              {notices.length === 0 && (
+                <div className="card p-8 text-center text-gray-400">No notices available</div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
+
+      {
+        activeTab === 'complaints' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl font-bold text-white">Submit a Complaint</h2>
+              <Button
+                onClick={() => setIsComplaintModalOpen(true)}
+                className="bg-white text-black hover:bg-gray-200"
+              >
+                New Complaint
+              </Button>
+            </div>
+
+            <div className="card p-6 bg-yellow-900 bg-opacity-20 border-yellow-600">
+              <h3 className="text-lg font-semibold text-yellow-400 mb-2">📢 Anonymous Submission</h3>
+              <p className="text-gray-300">
+                Your complaints will be submitted anonymously. The headmaster will not be able to see your identity,
+                ensuring you can report issues freely without any concerns.
+              </p>
+            </div>
+
+            <div className="card p-8 text-center">
+              <div className="text-6xl mb-4">📝</div>
+              <h3 className="text-xl font-semibold text-white mb-2">Have a concern?</h3>
+              <p className="text-gray-400 mb-6">
+                Submit your complaints anonymously. We take all feedback seriously and work to resolve issues
+                promptly.
+              </p>
+              <Button
+                onClick={() => setIsComplaintModalOpen(true)}
+                className="bg-white text-black hover:bg-gray-200"
+              >
+                Submit Complaint
+              </Button>
+            </div>
+          </div>
+        )
+      }
 
       {/* Complaint Modal */}
       <Modal
@@ -363,6 +379,6 @@ export default function StudentPortal() {
           </div>
         </form>
       </Modal>
-    </Layout>
+    </Layout >
   );
 }

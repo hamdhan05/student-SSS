@@ -17,6 +17,10 @@ import {
   Complaint,
   AttendanceRecord,
   AcademicRecord,
+  Homework,
+  homeworks,
+  notifications,
+  Notification
 } from './mockData';
 
 // Simulated API delay
@@ -209,13 +213,35 @@ export const getHolidays = async (year: number = new Date().getFullYear()) => {
 export const getTodayHoliday = async () => {
   await delay();
   const today = new Date().toISOString().split('T')[0];
-  return holidays.find(h => h.date === today);
+  return holidays.find(h => h.date === today) || null;
 };
 
 // Fees
 export const getFees = async (studentId: string) => {
   await delay();
   return feeRecords.find(f => f.studentId === studentId) || null;
+};
+
+export const updateFeeRecord = async (studentId: string, terms: any[]) => {
+  await delay();
+  const index = feeRecords.findIndex(f => f.studentId === studentId);
+  if (index === -1) throw new Error('Fee record not found');
+
+  // Recalculate totals
+  const totalFee = terms.reduce((acc, t) => acc + t.amount, 0);
+  const paidAmount = terms.filter(t => t.status === 'paid').reduce((acc, t) => acc + t.amount, 0);
+  const dueAmount = totalFee - paidAmount;
+
+  feeRecords[index] = {
+    ...feeRecords[index],
+    terms,
+    totalFee,
+    paidAmount,
+    dueAmount,
+    lastPaymentDate: new Date().toISOString().split('T')[0],
+  };
+
+  return feeRecords[index];
 };
 
 export const getStudentFees = async (params: { classId?: string; section?: string; q?: string }) => {
@@ -322,13 +348,100 @@ export const markAttendanceBatch = async (params: {
   attendanceRecords.length = 0;
   attendanceRecords.push(...filtered, ...newRecords);
 
-  return { success: true, recordsAdded: newRecords.length };
+  // SIMULATION: Send SMS for absent students
+  let notificationCount = 0;
+  params.marks.forEach(mark => {
+    if (mark.status === 'absent') {
+      const student = students.find(s => s.id === mark.studentId);
+      if (student) {
+        notifications.push({
+          id: `notif_${Date.now()}_${student.id}`,
+          studentId: student.id,
+          type: 'sms',
+          message: `Dear Parent, your child ${student.name} is marked ABSENT today (${params.date}).`,
+          status: 'sent',
+          timestamp: new Date().toISOString(),
+        });
+        notificationCount++;
+      }
+    }
+  });
+
+  return { success: true, recordsAdded: newRecords.length, notificationCount };
 };
 
 // Academic records
 export const getAcademicsByStudent = async (studentId: string) => {
   await delay();
   return academicRecords.filter(a => a.studentId === studentId);
+};
+
+export const updateAcademicRecordBatch = async (params: {
+  classId: string;
+  section: string;
+  subject: string;
+  term: string;
+  marks: Array<{ studentId: string; marks: number; totalMarks: number; }>;
+}) => {
+  await delay();
+
+  // Remove existing records for this subject/term/student to avoid duplicates
+  params.marks.forEach(mark => {
+    const existingIndex = academicRecords.findIndex(
+      r => r.studentId === mark.studentId && r.subject === params.subject && r.term === params.term
+    );
+    if (existingIndex !== -1) {
+      academicRecords.splice(existingIndex, 1);
+    }
+
+    // Calculate grade
+    let grade = 'F';
+    const percentage = (mark.marks / mark.totalMarks) * 100;
+    if (percentage >= 90) grade = 'A+';
+    else if (percentage >= 80) grade = 'A';
+    else if (percentage >= 70) grade = 'B+';
+    else if (percentage >= 60) grade = 'B';
+    else if (percentage >= 50) grade = 'C';
+    else if (percentage >= 40) grade = 'D';
+
+    academicRecords.push({
+      studentId: mark.studentId,
+      subject: params.subject,
+      term: params.term,
+      marks: mark.marks,
+      totalMarks: mark.totalMarks,
+      grade
+    });
+  });
+
+  return { success: true };
+};
+
+// Homework
+export const getHomework = async (params: { classId: string; section?: string }) => {
+  await delay();
+  let filtered = [...homeworks];
+
+  if (params.classId) {
+    filtered = filtered.filter(h => h.class === params.classId);
+  }
+
+  if (params.section) {
+    filtered = filtered.filter(h => h.section === params.section);
+  }
+
+  return filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+};
+
+export const createHomework = async (homework: Omit<Homework, 'id' | 'createdAt'>) => {
+  await delay();
+  const newHomework: Homework = {
+    ...homework,
+    id: `hw${Date.now()}`,
+    createdAt: new Date().toISOString().split('T')[0],
+  };
+  homeworks.push(newHomework);
+  return newHomework;
 };
 
 export default {
@@ -345,6 +458,7 @@ export default {
   getHolidays,
   getTodayHoliday,
   getFees,
+  updateFeeRecord,
   getStudentFees,
   getComplaints,
   createComplaint,
@@ -352,8 +466,11 @@ export default {
   getAttendanceByStudent,
   markAttendanceBatch,
   getAcademicsByStudent,
+  updateAcademicRecordBatch,
   createStudent,
   updateStudent,
   createTeacher,
   updateTeacher,
+  getHomework,
+  createHomework,
 };

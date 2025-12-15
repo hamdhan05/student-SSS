@@ -120,6 +120,14 @@ export default function Students() {
       {/* Students Table */}
       {isLoading ? (
         <div className="card p-8 text-center text-gray-400">Loading students...</div>
+      ) : !selectedClass ? (
+        <div className="card p-12 text-center flex flex-col items-center justify-center text-gray-400">
+          <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mb-4 text-2xl">
+            🎓
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">Select a Class</h3>
+          <p>Please select a class from the filters above to view the student list.</p>
+        </div>
       ) : (
         <>
           <div className="card overflow-hidden">

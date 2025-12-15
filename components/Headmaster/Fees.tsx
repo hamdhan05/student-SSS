@@ -3,10 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import { getStudentFees, getClasses, getSections } from '@/lib/api';
 import Input from '@/components/UI/Input';
 
+import FeeEditModal from '@/components/Modals/FeeEditModal';
+
 export default function Fees() {
   const [selectedClass, setSelectedClass] = useState<number | null>(null);
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingFee, setEditingFee] = useState<any>(null);
 
   const { data: classes = [] } = useQuery({
     queryKey: ['classes'],
@@ -20,8 +24,8 @@ export default function Fees() {
 
   const { data: fees = [], isLoading } = useQuery({
     queryKey: ['fees', selectedClass, selectedSection, searchQuery],
-    queryFn: () => getStudentFees({ 
-      classId: selectedClass?.toString(), 
+    queryFn: () => getStudentFees({
+      classId: selectedClass?.toString(),
       section: selectedSection || undefined,
       q: searchQuery || undefined,
     }),
@@ -110,35 +114,62 @@ export default function Fees() {
               <tr className="border-b border-gray-700">
                 <th className="px-6 py-4 text-left text-sm font-semibold text-white">Roll No</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-white">Student Name</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-white">Class</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-white">Section</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-white">Month</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-white">Amount</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-white">Status</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-white">Class/Sec</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-white">Total</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-white">Paid</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-white">Due</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-white">Term 1</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-white">Term 2</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-white">Term 3</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-white">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredFees.map((item: any) => {
                 const { student, fees: feeData } = item;
-                const status = feeData.dueAmount === 0 ? 'paid' : 'pending';
+                const terms = feeData.terms || [];
+                const term1 = terms.find((t: any) => t.name === 'Term 1');
+                const term2 = terms.find((t: any) => t.name === 'Term 2');
+                const term3 = terms.find((t: any) => t.name === 'Term 3');
+
+                const renderTermStatus = (term: any) => {
+                  if (!term) return <span className="text-gray-500">-</span>;
+                  const colors = {
+                    paid: 'bg-green-900 text-green-400',
+                    pending: 'bg-yellow-900 text-yellow-400',
+                    overdue: 'bg-red-900 text-red-400',
+                  };
+                  return (
+                    <div className="flex flex-col items-center">
+                      <span className={`px-2 py-0.5 rounded text-xs font-semibold bg-opacity-30 ${colors[term.status as keyof typeof colors]}`}>
+                        {term.status}
+                      </span>
+                      <span className="text-xs text-gray-400 mt-1">₹{term.amount.toLocaleString()}</span>
+                    </div>
+                  );
+                };
+
                 return (
                   <tr key={student.id} className="border-b border-gray-800 hover:bg-white hover:bg-opacity-5">
                     <td className="px-6 py-4 text-sm text-gray-300">{student.rollNumber}</td>
                     <td className="px-6 py-4 text-sm text-white font-medium">{student.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-300">{student.class}</td>
-                    <td className="px-6 py-4 text-sm text-gray-300">{student.section}</td>
-                    <td className="px-6 py-4 text-sm text-gray-300">December 2025</td>
-                    <td className="px-6 py-4 text-sm text-gray-300 text-right">₹{feeData.totalFee}</td>
-                    <td className="px-6 py-4 text-sm text-center">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          status === 'paid'
-                            ? 'bg-green-900 bg-opacity-50 text-green-400'
-                            : 'bg-red-900 bg-opacity-50 text-red-400'
-                        }`}
+                    <td className="px-6 py-4 text-sm text-gray-300">{student.class}-{student.section}</td>
+                    <td className="px-6 py-4 text-sm text-white text-right font-medium">₹{feeData.totalFee.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-green-400 text-right">₹{feeData.paidAmount.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-red-400 text-right">₹{feeData.dueAmount.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-center">{renderTermStatus(term1)}</td>
+                    <td className="px-6 py-4 text-center">{renderTermStatus(term2)}</td>
+                    <td className="px-6 py-4 text-center">{renderTermStatus(term3)}</td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => {
+                          setEditingFee(item);
+                          setEditModalOpen(true);
+                        }}
+                        className="text-blue-400 hover:text-blue-300 text-sm font-medium"
                       >
-                        {status}
-                      </span>
+                        Edit
+                      </button>
                     </td>
                   </tr>
                 );
@@ -150,6 +181,21 @@ export default function Fees() {
             <div className="p-8 text-center text-gray-400">No fee records found</div>
           )}
         </div>
+      )}
+      {editingFee && (
+        <FeeEditModal
+          isOpen={editModalOpen}
+          onClose={() => {
+            setEditModalOpen(false);
+            setEditingFee(null);
+          }}
+          student={{
+            id: editingFee.student.id,
+            name: editingFee.student.name,
+            rollNumber: editingFee.student.rollNumber
+          }}
+          initialTerms={editingFee.fees.terms || []}
+        />
       )}
     </div>
   );

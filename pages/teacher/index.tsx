@@ -6,6 +6,8 @@ import { getClasses, getSections, getStudents, markAttendanceBatch, getTeacherBy
 import Button from '@/components/UI/Button';
 import Input from '@/components/UI/Input';
 import StudentDetailModal from '@/components/Modals/StudentDetailModal';
+import TeacherHomework from '@/components/Teacher/Homework';
+import TeacherMarks from '@/components/Teacher/Marks';
 
 export default function TeacherPortal() {
   const { user, loading } = useRequireAuth(['teacher']);
@@ -122,6 +124,8 @@ export default function TeacherPortal() {
   const tabs = [
     { id: 'dashboard', label: 'Attendance', icon: '📝' },
     { id: 'timetable', label: 'Timetable', icon: '📅' },
+    { id: 'homework', label: 'Homework', icon: '📚' },
+    { id: 'marks', label: 'Marks', icon: '📊' },
     { id: 'notices', label: 'Notices', icon: '📢' },
   ];
 
@@ -346,6 +350,16 @@ export default function TeacherPortal() {
           />
         )
       }
+
+
+
+      {activeTab === 'homework' && (
+        <TeacherHomework assignedClasses={assignedClasses} />
+      )}
+
+      {activeTab === 'marks' && (
+        <TeacherMarks assignedClasses={assignedClasses} />
+      )}
 
       {activeTab === 'notices' && (
         <div className="space-y-6">

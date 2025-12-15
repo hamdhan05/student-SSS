@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { markAttendanceBatch } from '@/lib/api';
 import PrivateRoute from '@/components/Auth/PrivateRoute';
 import AttendanceGrid from '@/components/Attendance/AttendanceGrid';
 import AttendanceBatchControls from '@/components/Attendance/AttendanceBatchControls';
@@ -71,18 +72,32 @@ export default function TeacherPage() {
 
   const handleSaveAttendance = async (records: any[]) => {
     try {
-      // Mock save - replace with real API call later
-      await new Promise(resolve => setTimeout(resolve, 500));
-      console.log('Saving attendance:', records);
-      alert('Attendance saved successfully!');
+      if (!teacher || !teacher.classes.length) return;
+      // Assuming first class/section for now as per current simple implementation
+      // In a real app, we'd select the specific class/section
+      const [cls, section] = ['10', 'A'];
+
+      const response = await markAttendanceBatch({
+        classId: cls,
+        section: section,
+        date: selectedDate.toISOString().split('T')[0],
+        marks: records
+      });
+
+      let message = 'Attendance saved successfully!';
+      if (response.notificationCount > 0) {
+        message += `\n${response.notificationCount} SMS notification(s) sent to parents of absent students.`;
+      }
+      alert(message);
     } catch (error) {
       console.error('Error saving attendance:', error);
       alert('Failed to save attendance');
     }
   };
 
-  const handleBatchUpdate = (studentIds: string[], status: 'present' | 'absent' | 'late') => {
-    console.log('Batch update:', studentIds, status);
+  const handleBatchUpdate = async (studentIds: string[], status: 'present' | 'absent' | 'late') => {
+    const records = studentIds.map(id => ({ studentId: id, status }));
+    await handleSaveAttendance(records);
   };
 
   const handleLogout = () => {
@@ -116,7 +131,7 @@ export default function TeacherPage() {
         <div className="space-y-6">
           {/* Header */}
           <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl border border-white border-opacity-10 p-8">
-            <div class="flex items-center gap-6">
+            <div className="flex items-center gap-6">
               <div className="h-20 w-20 rounded-full bg-black bg-opacity-50 border border-gray-600 flex items-center justify-center text-3xl text-white font-bold shadow-lg">
                 {teacher?.name.charAt(0)}
               </div>
