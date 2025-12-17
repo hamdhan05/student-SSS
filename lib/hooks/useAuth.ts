@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { teachers, students } from '../mockData';
+import { supabase } from '../supabaseClient';
+// import { teachers, students } from '../mockData'; // Deprecated for auth queries
 
 export type UserRole = 'headmaster' | 'teacher' | 'student' | null;
 
@@ -26,34 +27,42 @@ export function useAuth() {
     setLoading(false);
   }, []);
 
-
-
   const signIn = async (email: string, password: string) => {
     let role: UserRole = null;
     let name = '';
     let id = '';
 
-    // Check for Headmaster
+    // Check for Headmaster (Hardcoded for now as per original design)
     if (email === 'headmaster@school.com') {
       role = 'headmaster';
       name = 'Headmaster Admin';
       id = 'headmaster_1';
     }
-    // Check for Teacher
     else {
-      const teacher = teachers.find(t => t.email.toLowerCase() === email.toLowerCase());
-      if (teacher) {
-        role = 'teacher';
-        name = teacher.name;
-        id = teacher.id;
+      // 1. Check Students Table
+      const { data: student, error: studentError } = await supabase
+        .from('students')
+        .select('id, name, email')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (student) {
+        role = 'student';
+        name = student.name;
+        id = student.id;
       }
-      // Check for Student
       else {
-        const student = students.find(s => s.email.toLowerCase() === email.toLowerCase());
-        if (student) {
-          role = 'student';
-          name = student.name;
-          id = student.id;
+        // 2. Check Teachers Table
+        const { data: teacher, error: teacherError } = await supabase
+          .from('teachers')
+          .select('id, name, email')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (teacher) {
+          role = 'teacher';
+          name = teacher.name;
+          id = teacher.id;
         }
       }
     }

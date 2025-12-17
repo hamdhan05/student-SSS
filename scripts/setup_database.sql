@@ -133,12 +133,13 @@ alter table attendance_records enable row level security;
 alter table academic_records enable row level security;
 
 -- Public Read Policies (for development)
-create policy "Public read access" on students for select using (true);
-create policy "Public read access" on teachers for select using (true);
-create policy "Public read access" on notices for select using (true);
-create policy "Public read access" on holidays for select using (true);
-create policy "Public read access" on fee_records for select using (true);
-create policy "Public read access" on homeworks for select using (true);
-create policy "Public read access" on complaints for select using (true);
-create policy "Public read access" on attendance_records for select using (true);
-create policy "Public read access" on academic_records for select using (true);
+-- Public Access Policies (for development)
+create policy "Public access" on students for all using (true) with check (true);
+create policy "Public access" on teachers for all using (true) with check (true);
+create policy "Public access" on notices for all using (true) with check (true);
+create policy "Public access" on holidays for all using (true) with check (true);
+create policy "Public access" on fee_records for all using (true) with check (true);
+create policy "Public access" on homeworks for all using (true) with check (true);
+create policy "Public access" on complaints for all using (true) with check (true);
+create policy "Public access" on attendance_records for all using (true) with check (true);
+create policy "Public access" on academic_records for all using (true) with check (true);

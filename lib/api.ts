@@ -1,14 +1,5 @@
+import { supabase } from './supabaseClient';
 import {
-  students,
-  teachers,
-  notices,
-  holidays,
-  feeRecords,
-  complaints,
-  attendanceRecords,
-  academicRecords,
-  classes,
-  sections,
   Student,
   Teacher,
   Notice,
@@ -18,10 +9,13 @@ import {
   AttendanceRecord,
   AcademicRecord,
   Homework,
-  homeworks,
-  notifications,
   Notification
 } from './mockData';
+
+// Constants
+// Classes and Sections - In a real app these might also be in DB
+export const classes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+export const sections = ['A', 'B', 'C'];
 
 // Simulated API delay
 const delay = (ms: number = 300) => new Promise(resolve => setTimeout(resolve, ms));
@@ -45,79 +39,146 @@ export const getStudents = async (params?: {
   limit?: number;
   q?: string;
 }) => {
-  await delay();
-
-  let filtered = [...students];
+  let query = supabase.from('students').select(`
+    id, name, rollNumber:roll_number, class:class_grade, section, photo,
+    dateOfBirth:dob, gender, email, phone, address,
+    parentName:parent_name, parentPhone:parent_phone, parentEmail:parent_email,
+    admissionDate:admission_date
+  `, { count: 'exact' });
 
   if (params?.classId) {
-    const classStr = params.classId.toString();
-    filtered = filtered.filter(s => s.class === classStr);
+    query = query.eq('class_grade', params.classId.toString());
   }
 
   if (params?.section) {
-    filtered = filtered.filter(s => s.section === params.section);
+    query = query.eq('section', params.section);
   }
 
   if (params?.q) {
-    const query = params.q.toLowerCase();
-    filtered = filtered.filter(s =>
-      s.name.toLowerCase().includes(query) ||
-      s.rollNumber.includes(query) ||
-      s.email.toLowerCase().includes(query)
-    );
+    const q = params.q;
+    query = query.or(`name.ilike.%${q}%,roll_number.ilike.%${q}%,email.ilike.%${q}%`);
   }
 
   const page = params?.page || 1;
   const limit = params?.limit || 10;
   const start = (page - 1) * limit;
-  const end = start + limit;
+  const end = start + limit - 1;
+
+  query = query.range(start, end);
+
+  const { data, count, error } = await query;
+
+  if (error) throw error;
 
   return {
-    data: filtered.slice(start, end),
-    total: filtered.length,
+    data: data as unknown as Student[], // Type assertion due to aliasing
+    total: count || 0,
     page,
-    totalPages: Math.ceil(filtered.length / limit),
+    totalPages: Math.ceil((count || 0) / limit),
   };
 };
 
 export const createStudent = async (student: Omit<Student, 'id' | 'admissionDate'>) => {
-  await delay();
-  const newStudent: Student = {
-    ...student,
-    id: `s${Date.now()}`,
-    admissionDate: new Date().toISOString().split('T')[0],
-    photo: '/images/students/default.jpg',
+  // Map camelCase to snake_case
+  const dbStudent = {
+    name: student.name,
+    roll_number: student.rollNumber,
+    class_grade: student.class,
+    section: student.section,
+    photo: student.photo,
+    dob: student.dateOfBirth,
+    gender: student.gender,
+    email: student.email,
+    phone: student.phone,
+    address: student.address,
+    parent_name: student.parentName,
+    parent_phone: student.parentPhone,
+    parent_email: student.parentEmail,
+    // admission_date: default provided by DB or handled here? DB has default current_date.
   };
-  students.push(newStudent);
-  return newStudent;
+
+  const { data, error } = await supabase.from('students').insert(dbStudent).select(`
+     id, name, rollNumber:roll_number, class:class_grade, section, photo,
+    dateOfBirth:dob, gender, email, phone, address,
+    parentName:parent_name, parentPhone:parent_phone, parentEmail:parent_email,
+    admissionDate:admission_date
+  `).single();
+
+  if (error) throw error;
+  return data as unknown as Student;
 };
 
 export const getStudentById = async (id: string) => {
-  await delay();
-  const student = students.find(s => s.id === id);
-  if (!student) throw new Error('Student not found');
+  const { data: student, error } = await supabase.from('students').select(`
+     id, name, rollNumber:roll_number, class:class_grade, section, photo,
+    dateOfBirth:dob, gender, email, phone, address,
+    parentName:parent_name, parentPhone:parent_phone, parentEmail:parent_email,
+    admissionDate:admission_date,
+    guardianName:guardian_name, guardianPhone:guardian_phone
+  `).eq('id', id).single();
 
-  const fees = feeRecords.find(f => f.studentId === id);
-  const academics = academicRecords.filter(a => a.studentId === id);
-  const attendance = attendanceRecords.filter(a => a.studentId === id);
+  if (error) throw error;
 
-  // Calculate attendance percentage
-  const totalDays = attendance.length;
-  const presentDays = attendance.filter(a => a.status === 'present').length;
-  const attendancePercentage = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+  // We need to fetch related data separately or use joins if we refactor relations
+  // For now separate queries match the mock logic structure best given the complex shaping,
+  // but DB foreign keys allow eager loading. Let's stick to separate for speed of migration unless simple.
 
-  return {
-    ...student,
-    guardianName: student.parentName,
-    guardianPhone: student.parentPhone,
-    academics: academics,
-    fees: fees || {
+  const { data: feesData } = await supabase.from('fee_records').select('*').eq('student_id', id).single();
+  const { data: academicData } = await supabase.from('academic_records').select('*').eq('student_id', id);
+  const { data: attendanceData } = await supabase.from('attendance_records').select('*').eq('student_id', id);
+
+  // Fee shaping
+  let fees = null;
+  if (feesData) {
+    fees = {
+      id: feesData.id,
+      studentId: feesData.student_id,
+      totalFee: feesData.total_fee,
+      paidAmount: feesData.paid_amount,
+      dueAmount: feesData.due_amount,
+      lastPaymentDate: feesData.last_payment_date,
+      lastPaymentAmount: feesData.last_payment_amount,
+      terms: feesData.terms
+    };
+  } else {
+    fees = {
       totalFee: 50000,
       paidAmount: 0,
       dueAmount: 50000,
       lastPaymentDate: null,
       lastPaymentAmount: 0,
-    },
+    };
+  }
+
+  // Attendance shaping
+  const attendance = (attendanceData || []).map((a: any) => ({
+    id: a.id,
+    studentId: a.student_id,
+    date: a.date,
+    status: a.status
+  }));
+
+  // Academics shaping
+  const academics = (academicData || []).map((a: any) => ({
+    studentId: a.student_id,
+    subject: a.subject,
+    marks: a.marks,
+    totalMarks: a.total_marks,
+    grade: a.grade,
+    term: a.term
+  }));
+
+  // Calculate attendance percentage
+  const totalDays = attendance.length;
+  const presentDays = attendance.filter((a: any) => a.status === 'present').length;
+  const attendancePercentage = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+
+  return {
+    ...student,
+    guardianName: student.parentName || student.guardianName, // Fallback
+    guardianPhone: student.parentPhone || student.guardianPhone,
+    academics: academics,
+    fees: fees,
     attendance,
     attendancePercentage,
   };
@@ -125,146 +186,281 @@ export const getStudentById = async (id: string) => {
 
 // Teachers
 export const getTeachers = async () => {
-  await delay();
-  return teachers.map(t => ({
+  const { data, error } = await supabase.from('teachers').select(`
+    id, name, photo, domain, email, phone,
+    dateOfBirth:dob, joiningDate:joining_date, qualification, experience,
+    address, fatherName:father_name, motherName:mother_name, assigned_classes
+  `);
+
+  if (error) throw error;
+
+  // Transform assigned_classes to classes
+  return data.map((t: any) => ({
     ...t,
-    subject: t.domain,
-    classes: t.classes || [],
-  }));
+    subject: t.domain, // domain maps to subject
+    classes: t.assigned_classes || []
+  })) as Teacher[];
 };
 
 export const createTeacher = async (teacher: Omit<Teacher, 'id' | 'joiningDate'>) => {
-  await delay();
-  const newTeacher: Teacher = {
-    ...teacher,
-    id: `t${Date.now()}`,
-    joiningDate: new Date().toISOString().split('T')[0],
-    photo: '/images/teachers/default.jpg',
+  const dbTeacher = {
+    name: teacher.name,
+    photo: teacher.photo,
+    domain: teacher.domain,
+    email: teacher.email,
+    phone: teacher.phone,
+    dob: teacher.dateOfBirth,
+    qualification: teacher.qualification,
+    experience: teacher.experience,
+    address: teacher.address,
+    father_name: teacher.fatherName,
+    mother_name: teacher.motherName,
+    assigned_classes: teacher.classes
   };
-  teachers.push(newTeacher);
-  return newTeacher;
+
+  const { data, error } = await supabase.from('teachers').insert(dbTeacher).select(`
+    id, name, photo, domain, email, phone,
+    dateOfBirth:dob, joiningDate:joining_date, qualification, experience,
+    address, fatherName:father_name, motherName:mother_name, assigned_classes
+  `).single();
+
+  if (error) throw error;
+
+  return {
+    ...data,
+    subject: data.domain,
+    classes: data.assigned_classes || []
+  } as Teacher;
 };
 
 export const getTeacherById = async (id: string) => {
-  await delay();
-  const teacher = teachers.find(t => t.id === id);
-  if (!teacher) throw new Error('Teacher not found');
-  return teacher;
+  const { data, error } = await supabase.from('teachers').select(`
+    id, name, photo, domain, email, phone,
+    dateOfBirth:dob, joiningDate:joining_date, qualification, experience,
+    address, fatherName:father_name, motherName:mother_name, assigned_classes
+  `).eq('id', id).single();
+
+  if (error) throw error;
+
+  return {
+    ...data,
+    subject: data.domain,
+    classes: data.assigned_classes || []
+  };
 };
 
 export const updateStudent = async (student: Student) => {
-  await delay();
-  const index = students.findIndex((s) => s.id === student.id);
-  if (index !== -1) {
-    students[index] = student;
-    return student;
-  }
-  throw new Error('Student not found');
+  const dbStudent = {
+    name: student.name,
+    roll_number: student.rollNumber,
+    class_grade: student.class,
+    section: student.section,
+    photo: student.photo,
+    dob: student.dateOfBirth,
+    gender: student.gender,
+    email: student.email,
+    phone: student.phone,
+    address: student.address,
+    parent_name: student.parentName,
+    parent_phone: student.parentPhone,
+    parent_email: student.parentEmail,
+  };
+
+  const { data, error } = await supabase.from('students').update(dbStudent).eq('id', student.id).select(`
+     id, name, rollNumber:roll_number, class:class_grade, section, photo,
+    dateOfBirth:dob, gender, email, phone, address,
+    parentName:parent_name, parentPhone:parent_phone, parentEmail:parent_email,
+    admissionDate:admission_date
+  `).single();
+
+  if (error) throw error;
+  return data as unknown as Student;
 };
 
 export const updateTeacher = async (teacher: Teacher) => {
-  await delay();
-  const index = teachers.findIndex((t) => t.id === teacher.id);
-  if (index !== -1) {
-    teachers[index] = teacher;
-    return teacher;
-  }
-  throw new Error('Teacher not found');
+  const dbTeacher = {
+    name: teacher.name,
+    photo: teacher.photo,
+    domain: teacher.domain,
+    email: teacher.email,
+    phone: teacher.phone,
+    dob: teacher.dateOfBirth,
+    qualification: teacher.qualification,
+    experience: teacher.experience,
+    address: teacher.address,
+    father_name: teacher.fatherName,
+    mother_name: teacher.motherName,
+    assigned_classes: teacher.classes
+  };
+
+  const { data, error } = await supabase.from('teachers').update(dbTeacher).eq('id', teacher.id).select(`
+    id, name, photo, domain, email, phone,
+    dateOfBirth:dob, joiningDate:joining_date, qualification, experience,
+    address, fatherName:father_name, motherName:mother_name, assigned_classes
+  `).single();
+
+  if (error) throw error;
+
+  return {
+    ...data,
+    subject: data.domain,
+    classes: data.assigned_classes || []
+  } as Teacher;
 };
 
 // Notices
 export const getNotices = async () => {
-  await delay();
-  return [...notices].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const { data, error } = await supabase
+    .from('notices')
+    .select('id, title, content, date, createdBy:created_by, createdAt:created_at')
+    .order('date', { ascending: false });
+
+  if (error) throw error;
+  return data as Notice[];
 };
 
 export const createNotice = async (notice: Omit<Notice, 'id'>) => {
-  await delay();
-  const newNotice = {
-    ...notice,
-    id: `n${Date.now()}`,
+  const dbNotice = {
+    title: notice.title,
+    content: notice.content,
+    date: notice.date,
+    created_by: notice.createdBy,
   };
-  notices.push(newNotice);
-  return newNotice;
+
+  const { data, error } = await supabase.from('notices').insert(dbNotice).select('id, title, content, date, createdBy:created_by, createdAt:created_at').single();
+  if (error) throw error;
+  return data as Notice;
 };
 
 export const updateNotice = async (id: string, updates: Partial<Notice>) => {
-  await delay();
-  const index = notices.findIndex(n => n.id === id);
-  if (index === -1) throw new Error('Notice not found');
-  notices[index] = { ...notices[index], ...updates };
-  return notices[index];
+  const dbUpdates: any = { ...updates };
+  if (updates.createdBy) {
+    dbUpdates.created_by = updates.createdBy;
+    delete dbUpdates.createdBy;
+  }
+
+  const { data, error } = await supabase.from('notices').update(dbUpdates).eq('id', id).select('id, title, content, date, createdBy:created_by, createdAt:created_at').single();
+  if (error) throw error;
+  return data as Notice;
 };
 
 export const deleteNotice = async (id: string) => {
-  await delay();
-  const index = notices.findIndex(n => n.id === id);
-  if (index === -1) throw new Error('Notice not found');
-  notices.splice(index, 1);
+  const { error } = await supabase.from('notices').delete().eq('id', id);
+  if (error) throw error;
   return { success: true };
 };
 
 // Holidays
 export const getHolidays = async (year: number = new Date().getFullYear()) => {
-  await delay();
-  return holidays.filter(h => new Date(h.date).getFullYear() === year);
+  // Supabase doesn't support easy year extraction in filter without RPC/functions or raw SQL usually
+  // But we can filter by range
+  const start = `${year}-01-01`;
+  const end = `${year}-12-31`;
+
+  const { data, error } = await supabase.from('holidays')
+    .select('*')
+    .gte('date', start)
+    .lte('date', end);
+
+  if (error) throw error;
+  return data as Holiday[];
 };
 
 export const getTodayHoliday = async () => {
-  await delay();
   const today = new Date().toISOString().split('T')[0];
-  return holidays.find(h => h.date === today) || null;
+  const { data, error } = await supabase.from('holidays')
+    .select('*')
+    .eq('date', today)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data || null;
 };
 
 // Fees
 export const getFees = async (studentId: string) => {
-  await delay();
-  return feeRecords.find(f => f.studentId === studentId) || null;
+  const { data, error } = await supabase.from('fee_records').select(`
+    id, studentId:student_id, totalFee:total_fee, paidAmount:paid_amount,
+    dueAmount:due_amount, lastPaymentDate:last_payment_date, lastPaymentAmount:last_payment_amount,
+    terms
+  `).eq('student_id', studentId).maybeSingle();
+
+  if (error) throw error;
+  return data as FeeRecord || null;
 };
 
 export const updateFeeRecord = async (studentId: string, terms: any[]) => {
-  await delay();
-  const index = feeRecords.findIndex(f => f.studentId === studentId);
-  if (index === -1) throw new Error('Fee record not found');
-
   // Recalculate totals
   const totalFee = terms.reduce((acc, t) => acc + t.amount, 0);
   const paidAmount = terms.filter(t => t.status === 'paid').reduce((acc, t) => acc + t.amount, 0);
-  const dueAmount = totalFee - paidAmount;
+  // dueAmount is generated always in SQL, but we might pass it or just let DB handle. 
+  // Let's pass total and paid.
 
-  feeRecords[index] = {
-    ...feeRecords[index],
+  const lastPaymentDate = new Date().toISOString().split('T')[0];
+
+  const { data, error } = await supabase.from('fee_records').update({
     terms,
-    totalFee,
-    paidAmount,
-    dueAmount,
-    lastPaymentDate: new Date().toISOString().split('T')[0],
-  };
+    total_fee: totalFee,
+    paid_amount: paidAmount,
+    last_payment_date: lastPaymentDate
+  }).eq('student_id', studentId).select(`
+    id, studentId:student_id, totalFee:total_fee, paidAmount:paid_amount,
+    dueAmount:due_amount, lastPaymentDate:last_payment_date, lastPaymentAmount:last_payment_amount,
+    terms
+  `).single();
 
-  return feeRecords[index];
+  if (error) throw error;
+  return data;
 };
 
 export const getStudentFees = async (params: { classId?: string; section?: string; q?: string }) => {
-  await delay();
-  let filtered = [...students];
+  // First get students
+  let query = supabase.from('students').select('id, name, roll_number, class_grade, section');
 
   if (params.classId) {
-    filtered = filtered.filter(s => s.class === params.classId);
+    query = query.eq('class_grade', params.classId);
   }
-
   if (params.section) {
-    filtered = filtered.filter(s => s.section === params.section);
+    query = query.eq('section', params.section);
   }
-
   if (params.q) {
-    const query = params.q.toLowerCase();
-    filtered = filtered.filter(s =>
-      s.name.toLowerCase().includes(query) || s.rollNumber.includes(query)
-    );
+    const q = params.q;
+    query = query.or(`name.ilike.%${q}%,roll_number.ilike.%${q}%`);
   }
 
-  return filtered.map(student => {
-    const fees = feeRecords.find(f => f.studentId === student.id) || {
+  const { data: studentsData, error: studentError } = await query;
+  if (studentError) throw studentError;
+
+  // Then get fees for these students
+  // Ideally we use a join, but for simplicity/mapping to current structure:
+  const studentIds = studentsData.map(s => s.id);
+  const { data: feesData, error: feeError } = await supabase.from('fee_records').select('*').in('student_id', studentIds);
+
+  if (feeError) throw feeError;
+
+  return studentsData.map(s => {
+    const f = feesData?.find(fee => fee.student_id === s.id);
+
+    // Shape student
+    const studentObj = {
+      id: s.id,
+      name: s.name,
+      rollNumber: s.roll_number,
+      class: s.class_grade,
+      section: s.section
+    } as any;
+
+    // Shape fees
+    const feesObj = f ? {
+      id: f.id,
+      studentId: f.student_id,
+      totalFee: f.total_fee,
+      paidAmount: f.paid_amount,
+      dueAmount: f.due_amount,
+      lastPaymentDate: f.last_payment_date,
+      lastPaymentAmount: f.last_payment_amount,
+      terms: f.terms
+    } : {
       totalFee: 50000,
       paidAmount: 0,
       dueAmount: 50000,
@@ -273,51 +469,90 @@ export const getStudentFees = async (params: { classId?: string; section?: strin
     };
 
     return {
-      student,
-      fees,
+      student: studentObj,
+      fees: feesObj
     };
   });
 };
 
 // Complaints
 export const getComplaints = async () => {
-  await delay();
-  // Return complaints without studentId for anonymity
-  return complaints.map(({ studentId, ...complaint }) => ({
+  const { data, error } = await supabase.from('complaints').select(`
+    id, category, date, text, status, studentId:student_id,
+    title, description, createdAt:created_at
+  `).order('date', { ascending: false });
+
+  if (error) throw error;
+
+  // Return complaints without studentId for anonymity (as per original logic, but here we just strip it)
+  // Logic says: "Return complaints without studentId".
+  // Note: in DB we fetch it, but we can return object without it.
+  return data.map(({ studentId, ...complaint }: any) => ({
     ...complaint,
-    title: complaint.category,
-    description: complaint.text,
-    createdAt: complaint.date,
+    title: complaint.title || complaint.category, // Handle legacy/new fields
+    description: complaint.description || complaint.text,
+    createdAt: complaint.createdAt || complaint.date,
   }));
 };
 
 export const createComplaint = async (complaint: { category: string; text: string; studentId: string }) => {
-  await delay();
-  const newComplaint = {
-    ...complaint,
-    id: `c${Date.now()}`,
+  const dbComplaint = {
+    category: complaint.category,
+    text: complaint.text,
+    student_id: complaint.studentId,
+    status: 'pending',
     date: new Date().toISOString().split('T')[0],
-    status: 'pending' as const,
+    title: complaint.category, // Map category to title for consistency if needed or keep separate
+    description: complaint.text
   };
-  complaints.push(newComplaint);
-  return newComplaint;
+
+  const { data, error } = await supabase.from('complaints').insert(dbComplaint).select(`
+    id, category, date, text, status, studentId:student_id,
+    title, description, createdAt:created_at
+  `).single();
+
+  if (error) throw error;
+  return data;
 };
 
 export const resolveComplaint = async (id: string) => {
-  await delay();
-  const complaint = complaints.find(c => c.id === id);
-  if (!complaint) throw new Error('Complaint not found');
-  complaint.status = 'resolved';
-  return complaint;
+  const { data, error } = await supabase.from('complaints').update({ status: 'resolved' }).eq('id', id).select('*').single();
+  if (error) throw error;
+  return data;
 };
 
 // Attendance
 export const getAttendanceByStudent = async (studentId: string, limit: number = 30) => {
-  await delay();
-  return attendanceRecords
-    .filter(a => a.studentId === studentId)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, limit);
+  const { data, error } = await supabase.from('attendance_records')
+    .select('id, studentId:student_id, date, status')
+    .eq('student_id', studentId)
+    .order('date', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return data as AttendanceRecord[];
+};
+
+export const getAttendanceByClassAndDate = async (classId: string, section: string, date: string) => {
+  // First get students in this class to filter (or we can join if we had explicit class relations in attendance, 
+  // but attendance links to students. So we can join students.)
+
+  const { data, error } = await supabase.from('attendance_records')
+    .select(`
+      id, studentId:student_id, date, status,
+      students!inner ( class_grade, section )
+    `)
+    .eq('date', date)
+    .eq('students.class_grade', classId)
+    .eq('students.section', section);
+
+  if (error) throw error;
+  return data.map((r: any) => ({
+    id: r.id,
+    studentId: r.studentId,
+    date: r.date,
+    status: r.status
+  })) as AttendanceRecord[];
 };
 
 export const markAttendanceBatch = async (params: {
@@ -326,54 +561,50 @@ export const markAttendanceBatch = async (params: {
   date: string;
   marks: Array<{ studentId: string; status: 'present' | 'absent' | 'late' | 'excused' }>;
 }) => {
-  await delay();
+  // Check logic: delete existing marks for this date/student to overwrite
+  const studentIds = params.marks.map(m => m.studentId);
 
-  // Remove existing attendance for this date and class/section
-  const studentsInClass = students.filter(
-    s => s.class === params.classId && s.section === params.section
-  ).map(s => s.id);
+  if (studentIds.length > 0) {
+    // Delete existing
+    await supabase.from('attendance_records')
+      .delete()
+      .in('student_id', studentIds)
+      .eq('date', params.date);
+  }
 
-  const filtered = attendanceRecords.filter(
-    a => !(studentsInClass.includes(a.studentId) && a.date === params.date)
-  );
-
-  // Add new attendance records
-  const newRecords = params.marks.map(mark => ({
-    id: `a${Date.now()}_${mark.studentId}`,
-    studentId: mark.studentId,
+  // Insert new
+  const records = params.marks.map(m => ({
+    student_id: m.studentId,
     date: params.date,
-    status: mark.status,
+    status: m.status
   }));
 
-  attendanceRecords.length = 0;
-  attendanceRecords.push(...filtered, ...newRecords);
+  if (records.length > 0) {
+    const { error } = await supabase.from('attendance_records').insert(records);
+    if (error) throw error;
+  }
 
-  // SIMULATION: Send SMS for absent students
+  // SIMULATION: Send SMS (Log only)
   let notificationCount = 0;
   params.marks.forEach(mark => {
     if (mark.status === 'absent') {
-      const student = students.find(s => s.id === mark.studentId);
-      if (student) {
-        notifications.push({
-          id: `notif_${Date.now()}_${student.id}`,
-          studentId: student.id,
-          type: 'sms',
-          message: `Dear Parent, your child ${student.name} is marked ABSENT today (${params.date}).`,
-          status: 'sent',
-          timestamp: new Date().toISOString(),
-        });
-        notificationCount++;
-      }
+      // Ideally fetch student name but skip for perf or do batch log
+      notificationCount++;
     }
   });
+  console.log(`[Mock SMS] Sent ${notificationCount} ABSENT notifications.`);
 
-  return { success: true, recordsAdded: newRecords.length, notificationCount };
+  return { success: true, recordsAdded: records.length, notificationCount };
 };
 
 // Academic records
 export const getAcademicsByStudent = async (studentId: string) => {
-  await delay();
-  return academicRecords.filter(a => a.studentId === studentId);
+  const { data, error } = await supabase.from('academic_records')
+    .select('studentId:student_id, subject, marks, totalMarks:total_marks, grade, term')
+    .eq('student_id', studentId);
+
+  if (error) throw error;
+  return data as AcademicRecord[];
 };
 
 export const updateAcademicRecordBatch = async (params: {
@@ -383,18 +614,19 @@ export const updateAcademicRecordBatch = async (params: {
   term: string;
   marks: Array<{ studentId: string; marks: number; totalMarks: number; }>;
 }) => {
-  await delay();
+  const studentIds = params.marks.map(m => m.studentId);
 
-  // Remove existing records for this subject/term/student to avoid duplicates
-  params.marks.forEach(mark => {
-    const existingIndex = academicRecords.findIndex(
-      r => r.studentId === mark.studentId && r.subject === params.subject && r.term === params.term
-    );
-    if (existingIndex !== -1) {
-      academicRecords.splice(existingIndex, 1);
-    }
+  // Delete existing records for this subject/term/student
+  if (studentIds.length > 0) {
+    await supabase.from('academic_records')
+      .delete()
+      .in('student_id', studentIds)
+      .eq('subject', params.subject)
+      .eq('term', params.term);
+  }
 
-    // Calculate grade
+  // Calculate grades and insert
+  const records = params.marks.map(mark => {
     let grade = 'F';
     const percentage = (mark.marks / mark.totalMarks) * 100;
     if (percentage >= 90) grade = 'A+';
@@ -404,44 +636,61 @@ export const updateAcademicRecordBatch = async (params: {
     else if (percentage >= 50) grade = 'C';
     else if (percentage >= 40) grade = 'D';
 
-    academicRecords.push({
-      studentId: mark.studentId,
+    return {
+      student_id: mark.studentId,
       subject: params.subject,
       term: params.term,
       marks: mark.marks,
-      totalMarks: mark.totalMarks,
+      total_marks: mark.totalMarks,
       grade
-    });
+    };
   });
+
+  if (records.length > 0) {
+    const { error } = await supabase.from('academic_records').insert(records);
+    if (error) throw error;
+  }
 
   return { success: true };
 };
 
 // Homework
 export const getHomework = async (params: { classId: string; section?: string }) => {
-  await delay();
-  let filtered = [...homeworks];
+  let query = supabase.from('homeworks').select(`
+    id, class:class_grade, section, subject, title, description,
+    dueDate:due_date, createdBy:created_by, createdAt:created_at
+  `).order('created_at', { ascending: false });
 
   if (params.classId) {
-    filtered = filtered.filter(h => h.class === params.classId);
+    query = query.eq('class_grade', params.classId);
   }
-
   if (params.section) {
-    filtered = filtered.filter(h => h.section === params.section);
+    query = query.eq('section', params.section);
   }
 
-  return filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const { data, error } = await query;
+  if (error) throw error;
+  return data as Homework[];
 };
 
 export const createHomework = async (homework: Omit<Homework, 'id' | 'createdAt'>) => {
-  await delay();
-  const newHomework: Homework = {
-    ...homework,
-    id: `hw${Date.now()}`,
-    createdAt: new Date().toISOString().split('T')[0],
+  const dbHomework = {
+    class_grade: homework.class,
+    section: homework.section,
+    subject: homework.subject,
+    title: homework.title,
+    description: homework.description,
+    due_date: homework.dueDate,
+    created_by: homework.createdBy
   };
-  homeworks.push(newHomework);
-  return newHomework;
+
+  const { data, error } = await supabase.from('homeworks').insert(dbHomework).select(`
+    id, class:class_grade, section, subject, title, description,
+    dueDate:due_date, createdBy:created_by, createdAt:created_at
+  `).single();
+
+  if (error) throw error;
+  return data as Homework;
 };
 
 export default {
@@ -464,6 +713,7 @@ export default {
   createComplaint,
   resolveComplaint,
   getAttendanceByStudent,
+  getAttendanceByClassAndDate,
   markAttendanceBatch,
   getAcademicsByStudent,
   updateAcademicRecordBatch,

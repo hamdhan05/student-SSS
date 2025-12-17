@@ -2,7 +2,8 @@ import { useRequireAuth } from '@/lib/hooks/useAuth';
 import Layout from '@/components/UI/Layout';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getClasses, getSections, getStudents, markAttendanceBatch, getTeacherById, getNotices } from '@/lib/api';
+import { getClasses, getSections, getStudents, markAttendanceBatch, getTeacherById, getNotices, getAttendanceByClassAndDate } from '@/lib/api';
+import { useEffect } from 'react';
 import Button from '@/components/UI/Button';
 import Input from '@/components/UI/Input';
 import StudentDetailModal from '@/components/Modals/StudentDetailModal';
@@ -60,6 +61,34 @@ export default function TeacherPortal() {
       }),
     enabled: !!selectedClass && !!selectedSection,
   });
+
+  // Fetch existing attendance for the selected date
+  const { data: existingAttendance } = useQuery({
+    queryKey: ['attendance', selectedClass, selectedSection, selectedDate],
+    queryFn: () => getAttendanceByClassAndDate(String(selectedClass), selectedSection, selectedDate),
+    enabled: !!selectedClass && !!selectedSection && !!selectedDate,
+  });
+
+  // Sync state with existing attendance
+  useEffect(() => {
+    if (existingAttendance && studentsData?.data) {
+      const initialMarks: Record<string, 'present' | 'absent'> = {};
+
+      // Default all to present first (opt-out model) or strictly follow DB?
+      // Let's default to present, then overwrite with DB records.
+      studentsData.data.forEach((s: any) => {
+        initialMarks[s.id] = 'present';
+      });
+
+      existingAttendance.forEach((r: any) => {
+        if (r.status === 'absent') {
+          initialMarks[r.studentId] = 'absent';
+        }
+      });
+
+      setAttendanceMarks(initialMarks);
+    }
+  }, [existingAttendance, studentsData]);
 
   const markAttendanceMutation = useMutation({
     mutationFn: markAttendanceBatch,

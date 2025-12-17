@@ -15,8 +15,8 @@ export default function StudentPortal() {
   const [isComplaintModalOpen, setIsComplaintModalOpen] = useState(false);
   const [complaintData, setComplaintData] = useState({ title: '', description: '' });
 
-  // Mock student ID - in a real app, this would come from the auth user
-  const studentId = 'S001';
+  // Use the authenticated user's ID
+  const studentId = user?.id || '';
 
   const { data: student } = useQuery({
     queryKey: ['student', studentId],
