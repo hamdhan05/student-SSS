@@ -51,9 +51,9 @@ export default function Students() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold text-white">Students</h2>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Students</h2>
         <Button
-          className="bg-white text-black hover:bg-gray-200"
+          className="!bg-gray-900 !text-white hover:!bg-gray-800 dark:!bg-white dark:!text-black dark:hover:!bg-gray-200"
           onClick={() => setIsAddStudentModalOpen(true)}
         >
           Add Student
@@ -61,28 +61,29 @@ export default function Students() {
       </div>
 
       {/* Filters */}
-      <div className="card p-6 space-y-4">
+      <div className="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 space-y-4 rounded-xl shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Search</label>
+            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Search</label>
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by name or roll..."
-              className="bg-white bg-opacity-10 text-white"
+              className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Class</label>
+            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Class</label>
             <select
               value={selectedClass || ''}
               onChange={(e) => setSelectedClass(e.target.value ? Number(e.target.value) : null)}
-              className="w-full px-4 py-2 rounded bg-white bg-opacity-10 text-white border border-gray-600"
+              style={{ colorScheme: 'light dark' }}
+              className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
-              <option value="">All Classes</option>
+              <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">All Classes</option>
               {classes.map((cls) => (
-                <option key={cls} value={cls} className="bg-black">
+                <option key={cls} value={cls} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                   Class {cls}
                 </option>
               ))}
@@ -90,15 +91,16 @@ export default function Students() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Section</label>
+            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Section</label>
             <select
               value={selectedSection || ''}
               onChange={(e) => setSelectedSection(e.target.value || null)}
-              className="w-full px-4 py-2 rounded bg-white bg-opacity-10 text-white border border-gray-600"
+              style={{ colorScheme: 'light dark' }}
+              className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
-              <option value="">All Sections</option>
+              <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">All Sections</option>
               {sections.map((sec) => (
-                <option key={sec} value={sec} className="bg-black">
+                <option key={sec} value={sec} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                   Section {sec}
                 </option>
               ))}
@@ -134,34 +136,34 @@ export default function Students() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-700">
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">Roll No</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">Name</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">Class</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">Section</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">Guardian</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">Phone</th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-white">Actions</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Roll No</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Name</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Class</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Section</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Guardian</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Phone</th>
+                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900 dark:text-white">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {studentsData?.data.map((student) => (
-                  <tr key={student.id} className="border-b border-gray-800 hover:bg-white hover:bg-opacity-5">
-                    <td className="px-6 py-4 text-sm text-gray-300">{student.rollNumber}</td>
-                    <td className="px-6 py-4 text-sm text-white font-medium">{student.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-300">{student.class}</td>
-                    <td className="px-6 py-4 text-sm text-gray-300">{student.section}</td>
-                    <td className="px-6 py-4 text-sm text-gray-300">{student.guardianName || student.parentName}</td>
-                    <td className="px-6 py-4 text-sm text-gray-300">{student.guardianPhone || student.parentPhone}</td>
+                  <tr key={student.id} className="border-b border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{student.rollNumber}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-white font-medium">{student.name}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{student.class}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{student.section}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{student.guardianName || student.parentName}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{student.guardianPhone || student.parentPhone}</td>
                     <td className="px-6 py-4 text-sm text-right">
                       <button
                         onClick={() => setViewStudentId(student.id)}
-                        className="px-3 py-1 rounded bg-white text-black mr-3 text-sm"
+                        className="px-3 py-1 rounded bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-white dark:text-black mr-3 text-sm"
                       >
                         View
                       </button>
                       <button
                         onClick={() => setEditStudentId(student.id)}
-                        className="px-3 py-1 rounded bg-gray-800 text-white text-sm"
+                        className="px-3 py-1 rounded bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 text-sm"
                       >
                         Edit
                       </button>
@@ -173,7 +175,7 @@ export default function Students() {
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between card p-4">
+          <div className="flex items-center justify-between card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl shadow-sm mt-4">
             <div className="text-sm text-gray-400">
               Showing {(page - 1) * 20 + 1} to {Math.min(page * 20, studentsData?.total || 0)} of{' '}
               {studentsData?.total} students

@@ -79,22 +79,22 @@ export default function Notices() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold text-white">Notice Board</h2>
-        <Button onClick={() => handleOpenModal()} className="bg-white text-black hover:bg-gray-200">
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Notice Board</h2>
+        <Button onClick={() => handleOpenModal()} className="!bg-gray-900 !text-white hover:!bg-gray-800 dark:!bg-white dark:!text-black dark:hover:!bg-gray-200">
           Create Notice
         </Button>
       </div>
 
       {isLoading ? (
-        <div className="card p-8 text-center text-gray-400">Loading notices...</div>
+        <div className="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-8 text-center text-gray-500 dark:text-gray-400">Loading notices...</div>
       ) : (
         <div className="space-y-4">
           {notices.map((notice) => (
-            <div key={notice.id} className="card p-6">
+            <div key={notice.id} className="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-lg shadow-sm">
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h3 className="text-xl font-semibold text-white mb-1">{notice.title}</h3>
-                  <p className="text-sm text-gray-400">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">{notice.title}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     {new Date(notice.createdAt || notice.date).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
@@ -105,24 +105,24 @@ export default function Notices() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleOpenModal(notice)}
-                    className="px-3 py-1 bg-white text-black rounded hover:bg-gray-200 text-sm"
+                    className="px-3 py-1 bg-gray-100 text-gray-900 rounded hover:bg-gray-200 dark:bg-white dark:text-black text-sm"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(notice.id)}
-                    className="px-3 py-1 bg-white text-black rounded hover:bg-gray-200 text-sm"
+                    className="px-3 py-1 bg-gray-100 text-gray-900 rounded hover:bg-gray-200 dark:bg-white dark:text-black text-sm"
                   >
                     Delete
                   </button>
                 </div>
               </div>
-              <p className="text-gray-300 whitespace-pre-wrap">{notice.content}</p>
+              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{notice.content}</p>
             </div>
           ))}
 
           {notices.length === 0 && (
-            <div className="card p-8 text-center text-gray-400">
+            <div className="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-8 text-center text-gray-500 dark:text-gray-400">
               No notices posted yet. Create your first notice!
             </div>
           )}
@@ -133,25 +133,25 @@ export default function Notices() {
       <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={editingNotice ? 'Edit Notice' : 'Create Notice'}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Title</label>
+            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Title</label>
             <Input
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="Enter notice title"
               required
-              className="bg-white bg-opacity-10 text-white"
+              className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Content</label>
+            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Content</label>
             <textarea
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               placeholder="Enter notice content"
               required
               rows={6}
-              className="w-full px-4 py-2 rounded bg-white bg-opacity-10 text-white border border-gray-600 focus:border-white focus:outline-none"
+              className="w-full px-4 py-2 rounded bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -166,13 +166,13 @@ export default function Notices() {
             <Button
               type="submit"
               disabled={createMutation.isPending || updateMutation.isPending}
-              className="bg-white text-black hover:bg-gray-200"
+              className="!bg-gray-900 !text-white hover:!bg-gray-800 dark:!bg-white dark:!text-black dark:hover:!bg-gray-200"
             >
               {createMutation.isPending || updateMutation.isPending
                 ? 'Saving...'
                 : editingNotice
-                ? 'Update'
-                : 'Create'}
+                  ? 'Update'
+                  : 'Create'}
             </Button>
           </div>
         </form>

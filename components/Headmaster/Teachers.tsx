@@ -30,9 +30,9 @@ export default function Teachers() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold text-white">Teachers</h2>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Teachers</h2>
         <Button
-          className="bg-white text-black hover:bg-gray-200"
+          className="!bg-gray-900 !text-white hover:!bg-gray-800 dark:!bg-white dark:!text-black dark:hover:!bg-gray-200"
           onClick={() => setIsAddTeacherModalOpen(true)}
         >
           Add Teacher
@@ -45,7 +45,7 @@ export default function Teachers() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search teachers by name, email, or subject..."
-          className="bg-white bg-opacity-10 text-white"
+          className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
         />
       </div>
 
@@ -55,13 +55,17 @@ export default function Teachers() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTeachers.map((teacher) => (
-            <div key={teacher.id} className="card p-6 hover:border-white transition-colors">
+            <div key={teacher.id} className="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 hover:border-blue-500 dark:hover:border-white transition-colors rounded-xl shadow-sm">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-2xl font-bold text-white">
-                  {teacher.name.charAt(0)}
+                <div className="w-16 h-16 rounded-full bg-blue-100 text-blue-600 dark:bg-white/20 dark:text-white flex items-center justify-center text-2xl font-bold overflow-hidden border border-gray-200 dark:border-gray-600">
+                  {teacher.photo && teacher.photo !== '/images/teachers/default.jpg' ? (
+                    <img src={teacher.photo} alt={teacher.name} className="w-full h-full object-cover" />
+                  ) : (
+                    teacher.name.charAt(0)
+                  )}
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white">{teacher.name}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{teacher.name}</h3>
                   <p className="text-sm text-gray-400">{teacher.subject || teacher.domain}</p>
                 </div>
               </div>
@@ -74,14 +78,14 @@ export default function Teachers() {
                   <span className="text-gray-400">Phone:</span> {teacher.phone}
                 </p>
                 <p>
-                  <span className="text-gray-400">Classes:</span> {teacher.classes?.join(', ') || 'Not assigned'}
+                  <span className="text-gray-500 dark:text-gray-400">Classes:</span> {teacher.classes?.join(', ') || 'Not assigned'}
                 </p>
               </div>
 
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={() => setViewTeacherId(teacher.id)}
-                  className="flex-1 px-4 py-2 bg-white text-black rounded hover:bg-gray-200 text-sm font-medium"
+                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-900 rounded hover:bg-gray-200 dark:bg-white dark:text-black text-sm font-medium"
                 >
                   View Details
                 </button>
@@ -90,7 +94,7 @@ export default function Teachers() {
                     setViewTeacherId(teacher.id);
                     setIsEditTeacherModalOpen(true);
                   }}
-                  className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm"
+                  className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 text-sm"
                 >
                   Edit
                 </button>

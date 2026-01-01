@@ -163,6 +163,7 @@ export default function TeacherPortal() {
       title="Teacher Portal"
       user={{
         ...user,
+        ...teacher, // Include fetched teacher data (photo, etc)
         role: user.role || undefined,
       }}
       tabs={tabs}
@@ -198,7 +199,7 @@ export default function TeacherPortal() {
                           return (
                             <td key={day} className="px-6 py-4 whitespace-nowrap text-center border-r border-gray-700 last:border-r-0">
                               {assignedClass ? (
-                                <div className="inline-flex flex-col items-center justify-center px-3 py-1 rounded-md bg-blue-500 bg-opacity-20 border border-blue-500 border-opacity-30 text-blue-200">
+                                <div className="flex flex-col">
                                   <span className="font-bold">Class {assignedClass}</span>
                                   <span className="text-xs opacity-75">Room {100 + Number(assignedClass.replace(/\D/g, ''))}</span>
                                 </div>
@@ -231,19 +232,19 @@ export default function TeacherPortal() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div>
-                  <label htmlFor="date-input" className="block text-sm font-medium text-gray-300 mb-2">Date</label>
+                  <label htmlFor="date-input" className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Date</label>
                   <Input
                     id="date-input"
                     name="date"
                     type="date"
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    className="bg-white bg-opacity-10 text-white"
+                    className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 px-4 py-2 rounded w-full"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="class-select" className="block text-sm font-medium text-gray-300 mb-2">Class</label>
+                  <label htmlFor="class-select" className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Class</label>
                   <select
                     id="class-select"
                     name="class"
@@ -252,11 +253,12 @@ export default function TeacherPortal() {
                       setSelectedClass(Number(e.target.value));
                       setSelectedSection(''); // Reset section when class changes
                     }}
-                    className="w-full px-4 py-2 rounded bg-white bg-opacity-10 text-white border border-gray-600"
+                    style={{ colorScheme: 'light dark' }}
+                    className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                   >
-                    <option value={0}>Select Class</option>
+                    <option value={0} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select Class</option>
                     {availableClasses.map((cls: any) => (
-                      <option key={cls} value={cls} className="bg-black">
+                      <option key={cls} value={cls} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                         Class {cls}
                       </option>
                     ))}
@@ -264,18 +266,19 @@ export default function TeacherPortal() {
                 </div>
 
                 <div>
-                  <label htmlFor="section-select" className="block text-sm font-medium text-gray-300 mb-2">Section</label>
+                  <label htmlFor="section-select" className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Section</label>
                   <select
                     id="section-select"
                     name="section"
                     value={selectedSection}
                     onChange={(e) => setSelectedSection(e.target.value)}
-                    className="w-full px-4 py-2 rounded bg-white bg-opacity-10 text-white border border-gray-600"
+                    style={{ colorScheme: 'light dark' }}
+                    className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                     disabled={!selectedClass}
                   >
-                    <option value="">Select Section</option>
+                    <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select Section</option>
                     {availableSections.map((sec: any) => (
-                      <option key={sec} value={sec} className="bg-black">
+                      <option key={sec} value={sec} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                         Section {sec}
                       </option>
                     ))}

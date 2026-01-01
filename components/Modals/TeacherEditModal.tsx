@@ -89,6 +89,22 @@ export default function TeacherEditModal({ isOpen, onClose, teacherId }: Teacher
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validate Age > 25
+        const dob = new Date(formData.dateOfBirth);
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const m = today.getMonth() - dob.getMonth();
+
+        if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+            age--;
+        }
+
+        if (age < 25) {
+            alert("Teacher must be at least 25 years old.");
+            return;
+        }
+
         updateTeacherMutation.mutate(formData);
     };
 
@@ -97,6 +113,21 @@ export default function TeacherEditModal({ isOpen, onClose, teacherId }: Teacher
             ...prev,
             [e.target.name]: e.target.value,
         }));
+    };
+
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData(prev => ({ ...prev, photo: reader.result as string }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleRemovePhoto = () => {
+        setFormData(prev => ({ ...prev, photo: '' }));
     };
 
     if (!isOpen) return null;
@@ -113,11 +144,52 @@ export default function TeacherEditModal({ isOpen, onClose, teacherId }: Teacher
         <Modal isOpen={isOpen} onClose={onClose} title="Edit Teacher">
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Personal Information */}
-                <div className="bg-white bg-opacity-5 p-6 rounded-xl border border-gray-700">
-                    <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                        <span className="p-2 bg-blue-500 bg-opacity-20 rounded-lg text-blue-400">👤</span>
+                <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
+                        <span className="p-2 rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">👤</span>
                         Personal Information
                     </h3>
+
+                    {/* Photo Upload */}
+                    <div className="mb-6 flex flex-col items-center">
+                        <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 mb-4 border-4 border-white dark:border-gray-600 shadow-lg relative group">
+                            {formData.photo ? (
+                                <img src={formData.photo} alt="Preview" className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-4xl">👤</div>
+                            )}
+                            <label className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center cursor-pointer transition-opacity">
+                                <span className="text-white text-xs font-bold">Change</span>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handlePhotoChange}
+                                    className="hidden"
+                                />
+                            </label>
+                        </div>
+                        <div className="flex gap-2">
+                            <label className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                                Upload Photo
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handlePhotoChange}
+                                    className="hidden"
+                                />
+                            </label>
+                            {formData.photo && (
+                                <button
+                                    type="button"
+                                    onClick={handleRemovePhoto}
+                                    className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
+                                >
+                                    Remove
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
@@ -168,6 +240,7 @@ export default function TeacherEditModal({ isOpen, onClose, teacherId }: Teacher
                                 value={formData.dateOfBirth}
                                 onChange={handleChange}
                                 required
+                                max={new Date().toISOString().split('T')[0]}
                                 className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
@@ -235,66 +308,62 @@ export default function TeacherEditModal({ isOpen, onClose, teacherId }: Teacher
                 </div>
 
                 {/* Class Assignment */}
-                <div className="bg-white bg-opacity-5 p-6 rounded-xl border border-gray-700">
-                    <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                        <span className="p-2 bg-orange-500 bg-opacity-20 rounded-lg text-orange-400">📚</span>
+                <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
+                        <span className="p-2 rounded-lg bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400">📚</span>
                         Assign Classes
                     </h3>
-                    <div className="flex gap-4 items-end mb-6">
+                    <div className="flex gap-4 items-end mb-4">
                         <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Class</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Class</label>
                             <select
                                 value={currentClass}
                                 onChange={(e) => setCurrentClass(e.target.value)}
-                                className="w-full px-4 py-3 rounded-lg bg-white bg-opacity-10 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+                                style={{ colorScheme: 'light dark' }}
+                                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                             >
                                 {[...Array(12)].map((_, i) => (
-                                    <option key={i + 1} value={i + 1} className="bg-gray-900">{i + 1}</option>
+                                    <option key={i + 1} value={i + 1} className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">{i + 1}</option>
                                 ))}
                             </select>
                         </div>
                         <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Section</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Section</label>
                             <select
                                 value={currentSection}
                                 onChange={(e) => setCurrentSection(e.target.value)}
-                                className="w-full px-4 py-3 rounded-lg bg-white bg-opacity-10 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+                                style={{ colorScheme: 'light dark' }}
+                                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                             >
                                 {['A', 'B', 'C', 'D'].map((sec) => (
-                                    <option key={sec} value={sec} className="bg-gray-900">{sec}</option>
+                                    <option key={sec} value={sec} className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">{sec}</option>
                                 ))}
                             </select>
                         </div>
                         <Button
                             type="button"
                             onClick={addClass}
-                            className="bg-green-600 hover:bg-green-500 text-white px-8 py-3 h-[48px] font-bold shadow-lg"
+                            className="bg-gray-200 text-black border border-gray-300 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:border-gray-600 transition-colors"
                         >
-                            + ADD CLASS
+                            Add
                         </Button>
                     </div>
 
-                    <div className="mb-2 text-sm text-gray-400">Assigned Classes:</div>
-                    <div className="flex flex-wrap gap-3 p-4 bg-black bg-opacity-20 rounded-lg min-h-[60px]">
+                    <div className="flex flex-wrap gap-2">
                         {formData.classes.map((cls) => (
-                            <div key={cls} className="flex items-center gap-3 pl-4 pr-2 py-2 bg-blue-600 bg-opacity-20 border border-blue-500 rounded-lg shadow-sm">
-                                <span className="text-blue-100 font-bold text-base">{cls}</span>
+                            <div key={cls} className="flex items-center gap-2 px-3 py-1 bg-black bg-opacity-10 dark:bg-opacity-30 rounded-full border border-gray-300 dark:border-gray-600">
+                                <span className="text-gray-900 dark:text-white text-sm font-medium">{cls}</span>
                                 <button
                                     type="button"
                                     onClick={() => removeClass(cls)}
-                                    className="p-1 hover:bg-red-500 hover:text-white text-gray-400 rounded-full transition-colors"
-                                    title="Remove class"
+                                    className="text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-white transition-colors"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                    </svg>
+                                    ×
                                 </button>
                             </div>
                         ))}
                         {formData.classes.length === 0 && (
-                            <div className="w-full flex items-center justify-center text-gray-500 italic">
-                                No classes assigned yet. Use the controls above to add classes.
-                            </div>
+                            <p className="text-gray-500 text-sm italic">No classes assigned yet.</p>
                         )}
                     </div>
                 </div>

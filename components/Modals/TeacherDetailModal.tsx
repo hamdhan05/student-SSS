@@ -40,8 +40,12 @@ export default function TeacherDetailModal({
                     {/* Header with Avatar */}
                     <div className="flex items-center justify-between border-b border-gray-700 pb-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-20 h-20 rounded-full bg-black bg-opacity-50 border border-gray-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                                {getInitials(teacher.name)}
+                            <div className="w-20 h-20 rounded-full bg-black bg-opacity-50 border border-gray-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg overflow-hidden shrink-0">
+                                {teacher.photo && teacher.photo !== '/images/teachers/default.jpg' ? (
+                                    <img src={teacher.photo} alt={teacher.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    getInitials(teacher.name)
+                                )}
                             </div>
                             <div>
                                 <h2 className="text-2xl font-bold text-white">{teacher.name}</h2>

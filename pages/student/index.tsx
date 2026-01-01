@@ -93,6 +93,7 @@ export default function StudentPortal() {
       title="Student Portal"
       user={{
         ...user,
+        ...student, // Include fetched student data (photo, etc)
         role: user.role || undefined,
       }}
       tabs={tabs}
@@ -169,7 +170,7 @@ export default function StudentPortal() {
                             {isBreak ? (
                               <span className="text-gray-500 italic">Lunch Break</span>
                             ) : (
-                              <div className="inline-flex flex-col items-center justify-center px-3 py-1 rounded-md bg-purple-500 bg-opacity-20 border border-purple-500 border-opacity-30 text-purple-200">
+                              <div className="flex flex-col items-center text-white">
                                 <span className="font-bold">{subject}</span>
                                 <span className="text-xs opacity-75">Room {101 + i}</span>
                               </div>
