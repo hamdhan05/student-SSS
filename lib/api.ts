@@ -43,7 +43,7 @@ export const getStudents = async (params?: {
     id, name, rollNumber:roll_number, class:class_grade, section, photo,
     dateOfBirth:dob, gender, email, phone, address,
     parentName:parent_name, parentPhone:parent_phone, parentEmail:parent_email,
-    admissionDate:admission_date
+    admissionDate:admission_date, admissionNumber:admission_number, emisNumber:emis_number
   `, { count: 'exact' });
 
   if (params?.classId) {
@@ -94,6 +94,8 @@ export const createStudent = async (student: Omit<Student, 'id' | 'admissionDate
     parent_name: student.parentName,
     parent_phone: student.parentPhone,
     parent_email: student.parentEmail,
+    admission_number: student.admissionNumber,
+    emis_number: student.emisNumber,
     // admission_date: default provided by DB or handled here? DB has default current_date.
   };
 
@@ -109,25 +111,32 @@ export const createStudent = async (student: Omit<Student, 'id' | 'admissionDate
 };
 
 export const getStudentById = async (id: string) => {
-  const { data: student, error } = await supabase.from('students').select(`
-     id, name, rollNumber:roll_number, class:class_grade, section, photo,
-    dateOfBirth:dob, gender, email, phone, address,
-    parentName:parent_name, parentPhone:parent_phone, parentEmail:parent_email,
-    admissionDate:admission_date,
-    guardianName:guardian_name, guardianPhone:guardian_phone
-  `).eq('id', id).single();
+  // Fetch student and all related data in ONE query using Supabase joins
+  const { data: student, error } = await supabase
+    .from('students')
+    .select(`
+      id, name, rollNumber:roll_number, class:class_grade, section, photo,
+      dateOfBirth:dob, gender, email, phone, address,
+      parentName:parent_name, parentPhone:parent_phone, parentEmail:parent_email,
+      admissionDate:admission_date,
+      guardianName:guardian_name, guardianPhone:guardian_phone,
+      admissionNumber:admission_number, emisNumber:emis_number,
+      fee_records (*),
+      attendance_records (id, date, status),
+      academic_records (subject, marks, total_marks, grade, term)
+    `)
+    .eq('id', id)
+    .single();
 
   if (error) throw error;
 
-  // We need to fetch related data separately or use joins if we refactor relations
-  // For now separate queries match the mock logic structure best given the complex shaping,
-  // but DB foreign keys allow eager loading. Let's stick to separate for speed of migration unless simple.
+  // Process Fees
+  // Note: One-to-one relation usually, but returns array if not specified singly in join config strictly.
+  // Assuming strict foreign key might make it object, but let's handle array possibility safely or object.
+  // Based on strict schema, it might be an object or array. Standard Supabase select on reversed FK is usually array unless 1:1.
+  // We'll treat it as potentially array[0] or object.
+  const feesData = Array.isArray(student.fee_records) ? student.fee_records[0] : student.fee_records;
 
-  const { data: feesData } = await supabase.from('fee_records').select('*').eq('student_id', id).single();
-  const { data: academicData } = await supabase.from('academic_records').select('*').eq('student_id', id);
-  const { data: attendanceData } = await supabase.from('attendance_records').select('*').eq('student_id', id);
-
-  // Fee shaping
   let fees = null;
   if (feesData) {
     fees = {
@@ -150,22 +159,12 @@ export const getStudentById = async (id: string) => {
     };
   }
 
-  // Attendance shaping
-  const attendance = (attendanceData || []).map((a: any) => ({
+  // Process Attendance
+  const attendance = (student.attendance_records || []).map((a: any) => ({
     id: a.id,
-    studentId: a.student_id,
+    studentId: id, // We know the ID
     date: a.date,
     status: a.status
-  }));
-
-  // Academics shaping
-  const academics = (academicData || []).map((a: any) => ({
-    studentId: a.student_id,
-    subject: a.subject,
-    marks: a.marks,
-    totalMarks: a.total_marks,
-    grade: a.grade,
-    term: a.term
   }));
 
   // Calculate attendance percentage
@@ -173,12 +172,27 @@ export const getStudentById = async (id: string) => {
   const presentDays = attendance.filter((a: any) => a.status === 'present').length;
   const attendancePercentage = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
 
+  // Process Academics
+  const academics = (student.academic_records || []).map((a: any) => ({
+    studentId: id,
+    subject: a.subject,
+    marks: a.marks,
+    totalMarks: a.total_marks,
+    grade: a.grade,
+    term: a.term
+  }));
+
   return {
     ...student,
-    guardianName: student.parentName || student.guardianName, // Fallback
+    // Remove the raw joined data from the spread result to keep object clean
+    fee_records: undefined,
+    attendance_records: undefined,
+    academic_records: undefined,
+
+    guardianName: student.parentName || student.guardianName,
     guardianPhone: student.parentPhone || student.guardianPhone,
-    academics: academics,
-    fees: fees,
+    academics,
+    fees,
     attendance,
     attendancePercentage,
   };
@@ -264,6 +278,8 @@ export const updateStudent = async (student: Student) => {
     parent_name: student.parentName,
     parent_phone: student.parentPhone,
     parent_email: student.parentEmail,
+    admission_number: student.admissionNumber,
+    emis_number: student.emisNumber,
   };
 
   const { data, error } = await supabase.from('students').update(dbStudent).eq('id', student.id).select(`
@@ -561,18 +577,6 @@ export const markAttendanceBatch = async (params: {
   date: string;
   marks: Array<{ studentId: string; status: 'present' | 'absent' | 'late' | 'excused' }>;
 }) => {
-  // Check logic: delete existing marks for this date/student to overwrite
-  const studentIds = params.marks.map(m => m.studentId);
-
-  if (studentIds.length > 0) {
-    // Delete existing
-    await supabase.from('attendance_records')
-      .delete()
-      .in('student_id', studentIds)
-      .eq('date', params.date);
-  }
-
-  // Insert new
   const records = params.marks.map(m => ({
     student_id: m.studentId,
     date: params.date,
@@ -580,7 +584,12 @@ export const markAttendanceBatch = async (params: {
   }));
 
   if (records.length > 0) {
-    const { error } = await supabase.from('attendance_records').insert(records);
+    // Upsert is much faster than Delete + Insert
+    // Requires UNIQUE constraint on (student_id, date)
+    const { error } = await supabase
+      .from('attendance_records')
+      .upsert(records, { onConflict: 'student_id, date' });
+
     if (error) throw error;
   }
 
@@ -588,7 +597,6 @@ export const markAttendanceBatch = async (params: {
   let notificationCount = 0;
   params.marks.forEach(mark => {
     if (mark.status === 'absent') {
-      // Ideally fetch student name but skip for perf or do batch log
       notificationCount++;
     }
   });
@@ -614,17 +622,6 @@ export const updateAcademicRecordBatch = async (params: {
   term: string;
   marks: Array<{ studentId: string; marks: number; totalMarks: number; }>;
 }) => {
-  const studentIds = params.marks.map(m => m.studentId);
-
-  // Delete existing records for this subject/term/student
-  if (studentIds.length > 0) {
-    await supabase.from('academic_records')
-      .delete()
-      .in('student_id', studentIds)
-      .eq('subject', params.subject)
-      .eq('term', params.term);
-  }
-
   // Calculate grades and insert
   const records = params.marks.map(mark => {
     let grade = 'F';
@@ -647,7 +644,12 @@ export const updateAcademicRecordBatch = async (params: {
   });
 
   if (records.length > 0) {
-    const { error } = await supabase.from('academic_records').insert(records);
+    // Upsert is much faster than Delete + Insert
+    // Requires UNIQUE constraint on (student_id, subject, term)
+    const { error } = await supabase
+      .from('academic_records')
+      .upsert(records, { onConflict: 'student_id, subject, term' });
+
     if (error) throw error;
   }
 

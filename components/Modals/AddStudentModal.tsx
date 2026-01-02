@@ -21,6 +21,8 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
         class: '',
         section: '',
         rollNumber: '',
+        admissionNumber: '',
+        emisNumber: '',
         parentName: '',
         parentPhone: '',
         parentEmail: '',
@@ -44,6 +46,8 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                 class: '',
                 section: '',
                 rollNumber: '',
+                admissionNumber: '',
+                emisNumber: '',
                 parentName: '',
                 parentPhone: '',
                 parentEmail: '',
@@ -122,7 +126,7 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Full Name</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Full Name <span className="text-red-500">*</span></label>
                             <Input
                                 name="name"
                                 value={formData.name}
@@ -132,12 +136,32 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Roll Number</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Roll Number <span className="text-red-500">*</span></label>
                             <Input
                                 name="rollNumber"
                                 value={formData.rollNumber}
                                 onChange={handleChange}
                                 required
+                                className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Admission Number <span className="text-red-500">*</span></label>
+                            <Input
+                                name="admissionNumber"
+                                value={formData.admissionNumber}
+                                onChange={handleChange}
+                                required
+                                placeholder="IMS-XXXX"
+                                className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">EMIS Number</label>
+                            <Input
+                                name="emisNumber"
+                                value={formData.emisNumber}
+                                onChange={handleChange}
                                 className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
                             />
                         </div>
@@ -155,7 +179,7 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Date of Birth</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Date of Birth <span className="text-red-500">*</span></label>
                             <Input
                                 type="date"
                                 name="dateOfBirth"
@@ -172,12 +196,11 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                required
                                 className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Phone</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Phone <span className="text-red-500">*</span></label>
                             <Input
                                 name="phone"
                                 value={formData.phone}
@@ -187,7 +210,7 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Class</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Class <span className="text-red-500">*</span></label>
                             <Input
                                 name="class"
                                 value={formData.class}
@@ -198,7 +221,7 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Section</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Section <span className="text-red-500">*</span></label>
                             <Input
                                 name="section"
                                 value={formData.section}
@@ -229,7 +252,7 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Parent Name</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Parent Name <span className="text-red-500">*</span></label>
                             <Input
                                 name="parentName"
                                 value={formData.parentName}
@@ -239,7 +262,7 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Parent Phone</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Parent Phone <span className="text-red-500">*</span></label>
                             <Input
                                 name="parentPhone"
                                 value={formData.parentPhone}

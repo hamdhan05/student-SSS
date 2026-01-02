@@ -154,7 +154,7 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Full Name</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Full Name <span className="text-red-500">*</span></label>
                             <Input
                                 name="name"
                                 value={formData.name}
@@ -164,7 +164,7 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Subject/Domain</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Subject/Domain <span className="text-red-500">*</span></label>
                             <Input
                                 name="domain"
                                 value={formData.domain}
@@ -175,7 +175,7 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Email</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Email <span className="text-red-500">*</span></label>
                             <Input
                                 type="email"
                                 name="email"
@@ -186,7 +186,7 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Phone</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Phone <span className="text-red-500">*</span></label>
                             <Input
                                 name="phone"
                                 value={formData.phone}
@@ -196,7 +196,7 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Date of Birth</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Date of Birth <span className="text-red-500">*</span></label>
                             <Input
                                 type="date"
                                 name="dateOfBirth"
@@ -228,7 +228,7 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Qualification</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Qualification <span className="text-red-500">*</span></label>
                             <Input
                                 name="qualification"
                                 value={formData.qualification}
@@ -238,7 +238,7 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Experience</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Experience <span className="text-red-500">*</span></label>
                             <Input
                                 name="experience"
                                 value={formData.experience}
@@ -249,7 +249,7 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Father Name</label>
+                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Father Name <span className="text-red-500">*</span></label>
                             <Input
                                 name="fatherName"
                                 value={formData.fatherName}
@@ -264,7 +264,6 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 name="motherName"
                                 value={formData.motherName}
                                 onChange={handleChange}
-                                required
                                 className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
                             />
                         </div>

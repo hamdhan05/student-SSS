@@ -14,13 +14,14 @@ interface StudentCardProps {
   onClick?: (student: Student) => void;
 }
 
+import { maskPhoneNumber } from '@/lib/utils';
+
 export default function StudentCard({ student, onClick }: StudentCardProps) {
   return (
     <div
       onClick={() => onClick?.(student)}
-      className={`bg-white rounded-lg shadow-md p-4 border border-gray-200 ${
-        onClick ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''
-      }`}
+      className={`bg-white rounded-lg shadow-md p-4 border border-gray-200 ${onClick ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''
+        }`}
     >
       <div className="flex items-center gap-4">
         <div className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white text-xl font-bold">
@@ -50,7 +51,7 @@ export default function StudentCard({ student, onClick }: StudentCardProps) {
             <p className="text-xs text-gray-500">📧 {student.email}</p>
           )}
           {student.phone && (
-            <p className="text-xs text-gray-500">📞 {student.phone}</p>
+            <p className="text-xs text-gray-500">📞 {maskPhoneNumber(student.phone)}</p>
           )}
         </div>
       )}

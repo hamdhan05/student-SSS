@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Button from '@/components/UI/Button';
 import Modal from '@/components/UI/Modal';
+import { maskPhoneNumber } from '@/lib/utils';
 
 interface Teacher {
   id: string;
@@ -60,11 +61,10 @@ export default function TeacherGrid({
                 </div>
               </div>
               <span
-                className={`px-2 py-1 text-xs rounded-full ${
-                  teacher.status === 'active'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-800'
-                }`}
+                className={`px-2 py-1 text-xs rounded-full ${teacher.status === 'active'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-gray-100 text-gray-800'
+                  }`}
               >
                 {teacher.status}
               </span>
@@ -72,7 +72,7 @@ export default function TeacherGrid({
 
             <div className="space-y-2 mb-4">
               <p className="text-sm text-gray-600">📧 {teacher.email}</p>
-              {teacher.phone && <p className="text-sm text-gray-600">📞 {teacher.phone}</p>}
+              {teacher.phone && <p className="text-sm text-gray-600">📞 {maskPhoneNumber(teacher.phone)}</p>}
               <p className="text-sm text-gray-600">
                 📚 {teacher.classes.length} class{teacher.classes.length !== 1 ? 'es' : ''}
               </p>

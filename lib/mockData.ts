@@ -17,6 +17,8 @@ export interface Student {
   parentPhone: string;
   parentEmail: string;
   admissionDate: string;
+  admissionNumber?: string;
+  emisNumber?: string;
   guardianName?: string;
   guardianPhone?: string;
   academics?: AcademicRecord[];

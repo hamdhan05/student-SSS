@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getTeachers } from '@/lib/api';
+import { maskPhoneNumber } from '@/lib/utils';
 import Button from '@/components/UI/Button';
 import Input from '@/components/UI/Input';
 import AddTeacherModal from '@/components/Modals/AddTeacherModal';
@@ -75,7 +76,7 @@ export default function Teachers() {
                   <span className="text-gray-400">Email:</span> {teacher.email}
                 </p>
                 <p>
-                  <span className="text-gray-400">Phone:</span> {teacher.phone}
+                  <span className="text-gray-400">Phone:</span> {maskPhoneNumber(teacher.phone)}
                 </p>
                 <p>
                   <span className="text-gray-500 dark:text-gray-400">Classes:</span> {teacher.classes?.join(', ') || 'Not assigned'}
