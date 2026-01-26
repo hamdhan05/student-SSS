@@ -39,13 +39,13 @@ export default function Fees() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold text-white">Fee Management</h2>
+      <h2 className="text-3xl font-bold text-gray-600 dark:text-white">Fee Management</h2>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="card p-6">
-          <h3 className="text-sm text-gray-400 mb-2">Total Amount</h3>
-          <p className="text-3xl font-bold text-white">₹{totalAmount.toLocaleString()}</p>
+          <h3 className="text-sm text-gray-600 dark:text-gray-400 mb-2">Total Amount</h3>
+          <p className="text-3xl font-bold text-gray-600 dark:text-white">₹{totalAmount.toLocaleString()}</p>
         </div>
         <div className="card p-6 border-green-600">
           <h3 className="text-sm text-gray-400 mb-2">Collected</h3>
@@ -66,7 +66,7 @@ export default function Fees() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by name or roll..."
-              className="bg-white bg-opacity-10 text-white"
+              variant="glass"
             />
           </div>
 
@@ -75,11 +75,11 @@ export default function Fees() {
             <select
               value={selectedClass || ''}
               onChange={(e) => setSelectedClass(e.target.value ? Number(e.target.value) : null)}
-              className="w-full px-4 py-2 rounded bg-white bg-opacity-10 text-white border border-gray-600"
+              className="w-full px-4 py-2 rounded-lg bg-surface text-gray-600 border border-gray-200 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-light dark:focus:ring-blue-500"
             >
-              <option value="">All Classes</option>
+              <option value="" className="bg-white text-gray-900 dark:bg-black dark:text-white">All Classes</option>
               {classes.map((cls) => (
-                <option key={cls} value={cls} className="bg-black">
+                <option key={cls} value={cls} className="bg-white text-gray-900 dark:bg-black dark:text-white">
                   Class {cls}
                 </option>
               ))}
@@ -91,11 +91,11 @@ export default function Fees() {
             <select
               value={selectedSection || ''}
               onChange={(e) => setSelectedSection(e.target.value || null)}
-              className="w-full px-4 py-2 rounded bg-white bg-opacity-10 text-white border border-gray-600"
+              className="w-full px-4 py-2 rounded-lg bg-surface text-gray-600 border border-gray-200 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-light dark:focus:ring-blue-500"
             >
-              <option value="">All Sections</option>
+              <option value="" className="bg-white text-gray-900 dark:bg-black dark:text-white">All Sections</option>
               {sections.map((sec) => (
-                <option key={sec} value={sec} className="bg-black">
+                <option key={sec} value={sec} className="bg-white text-gray-900 dark:bg-black dark:text-white">
                   Section {sec}
                 </option>
               ))}
@@ -112,16 +112,16 @@ export default function Fees() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-700">
-                <th className="px-6 py-4 text-left text-sm font-semibold text-white">Roll No</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-white">Student Name</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-white">Class/Sec</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-white">Total</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-white">Paid</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-white">Due</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-white">Term 1</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-white">Term 2</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-white">Term 3</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-white">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-white">Roll No</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-white">Student Name</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-white">Class/Sec</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-white">Total</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-white">Paid</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-white">Due</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600 dark:text-white">Term 1</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600 dark:text-white">Term 2</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600 dark:text-white">Term 3</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-white">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -144,19 +144,19 @@ export default function Fees() {
                       <span className={`px-2 py-0.5 rounded text-xs font-semibold bg-opacity-30 ${colors[term.status as keyof typeof colors]}`}>
                         {term.status}
                       </span>
-                      <span className="text-xs text-gray-400 mt-1">₹{term.amount.toLocaleString()}</span>
+                      <span className="text-xs text-gray-600 dark:text-gray-400 mt-1">₹{term.amount.toLocaleString()}</span>
                     </div>
                   );
                 };
 
                 return (
-                  <tr key={student.id} className="border-b border-gray-800 hover:bg-white hover:bg-opacity-5">
-                    <td className="px-6 py-4 text-sm text-gray-300">{student.rollNumber}</td>
-                    <td className="px-6 py-4 text-sm text-white font-medium">{student.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-300">{student.class}-{student.section}</td>
-                    <td className="px-6 py-4 text-sm text-white text-right font-medium">₹{feeData.totalFee.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-sm text-green-400 text-right">₹{feeData.paidAmount.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-sm text-red-400 text-right">₹{feeData.dueAmount.toLocaleString()}</td>
+                  <tr key={student.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/5">
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{student.rollNumber}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-white font-medium">{student.name}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{student.class}-{student.section}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-white text-right font-medium">₹{feeData.totalFee.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-green-600 dark:text-green-400 text-right">₹{feeData.paidAmount.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-red-600 dark:text-red-400 text-right">₹{feeData.dueAmount.toLocaleString()}</td>
                     <td className="px-6 py-4 text-center">{renderTermStatus(term1)}</td>
                     <td className="px-6 py-4 text-center">{renderTermStatus(term2)}</td>
                     <td className="px-6 py-4 text-center">{renderTermStatus(term3)}</td>

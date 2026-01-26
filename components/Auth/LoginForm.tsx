@@ -48,6 +48,7 @@ export default function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              variant="glass"
               className="bg-white bg-opacity-15 backdrop-blur-sm text-white placeholder-gray-300 border-white border-opacity-30 rounded-full"
             />
 
@@ -59,6 +60,7 @@ export default function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              variant="glass"
               className="bg-white bg-opacity-15 backdrop-blur-sm text-white placeholder-gray-300 border-white border-opacity-30 rounded-full"
             />
             <div className="flex justify-end">

@@ -33,6 +33,7 @@ export default function ForgotPassword() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
+                            variant="glass"
                             className="bg-white bg-opacity-15 text-white placeholder-gray-300 border-white border-opacity-30 rounded-full"
                         />
 

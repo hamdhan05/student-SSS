@@ -114,22 +114,23 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
     if (!isOpen) return null;
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Add New Teacher">
+        <Modal isOpen={isOpen} onClose={onClose} title="Add New Teacher" size="xl">
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Personal Information */}
-                <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                {/* Personal Information */}
+                <div className="bg-white dark:bg-white dark:bg-opacity-5 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                        <span className="p-2 rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">👤</span>
+                        <span className="p-2 rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-500 dark:bg-opacity-20 dark:text-blue-400">👤</span>
                         Personal Information
                     </h3>
 
                     {/* Photo Upload */}
                     <div className="mb-6 flex flex-col items-center">
-                        <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 mb-4 border-4 border-white dark:border-gray-600 shadow-lg relative group">
+                        <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-700 mb-4 border-4 border-gray-600 shadow-lg relative group">
                             {formData.photo ? (
                                 <img src={formData.photo} alt="Preview" className="w-full h-full object-cover" />
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center text-4xl">👤</div>
+                                <div className="w-full h-full flex items-center justify-center text-4xl text-gray-400">👤</div>
                             )}
                             <label className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center cursor-pointer transition-opacity">
                                 <span className="text-white text-xs font-bold">Change</span>
@@ -154,49 +155,49 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Full Name <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name <span className="text-red-500">*</span></label>
                             <Input
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
-                                className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
+                                className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Subject/Domain <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject/Domain <span className="text-red-500">*</span></label>
                             <Input
                                 name="domain"
                                 value={formData.domain}
                                 onChange={handleChange}
                                 required
                                 placeholder="e.g. Mathematics"
-                                className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
+                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Email <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email <span className="text-red-500">*</span></label>
                             <Input
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
-                                className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
+                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Phone <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone <span className="text-red-500">*</span></label>
                             <Input
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleChange}
                                 required
-                                className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
+                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Date of Birth <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date of Birth <span className="text-red-500">*</span></label>
                             <Input
                                 type="date"
                                 name="dateOfBirth"
@@ -204,76 +205,76 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 onChange={handleChange}
                                 required
                                 max={new Date().toISOString().split('T')[0]}
-                                className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
+                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Address</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Address</label>
                             <textarea
                                 name="address"
                                 value={formData.address}
                                 onChange={handleChange}
                                 rows={2}
-                                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                                className="w-full px-4 py-2 rounded-lg bg-white bg-opacity-10 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* Professional & Family Information */}
-                <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div className="bg-white dark:bg-white dark:bg-opacity-5 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                        <span className="p-2 rounded-lg bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400">🎓</span>
+                        <span className="p-2 rounded-lg bg-purple-100 text-purple-600 dark:bg-purple-500 dark:bg-opacity-20 dark:text-purple-400">🎓</span>
                         Professional & Family
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Qualification <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Qualification <span className="text-red-500">*</span></label>
                             <Input
                                 name="qualification"
                                 value={formData.qualification}
                                 onChange={handleChange}
                                 required
-                                className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
+                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Experience <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Experience <span className="text-red-500">*</span></label>
                             <Input
                                 name="experience"
                                 value={formData.experience}
                                 onChange={handleChange}
                                 required
                                 placeholder="e.g. 5 years"
-                                className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
+                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Father Name <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Father Name <span className="text-red-500">*</span></label>
                             <Input
                                 name="fatherName"
                                 value={formData.fatherName}
                                 onChange={handleChange}
                                 required
-                                className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
+                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Mother Name</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mother Name</label>
                             <Input
                                 name="motherName"
                                 value={formData.motherName}
                                 onChange={handleChange}
-                                className="bg-white dark:bg-white/10 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
+                                className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* Class Assignment */}
-                <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div className="bg-white dark:bg-white dark:bg-opacity-5 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                        <span className="p-2 rounded-lg bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400">📚</span>
+                        <span className="p-2 rounded-lg bg-orange-100 text-orange-600 dark:bg-orange-500 dark:bg-opacity-20 dark:text-orange-400">📚</span>
                         Assign Classes
                     </h3>
                     <div className="flex gap-4 items-end mb-4">

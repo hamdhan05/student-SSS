@@ -344,6 +344,7 @@ export default function StudentPortal() {
               onChange={(e) => setComplaintData({ ...complaintData, title: e.target.value })}
               placeholder="Brief title for your complaint"
               required
+              variant="glass"
               className="bg-white bg-opacity-10 text-white"
             />
           </div>
@@ -358,7 +359,7 @@ export default function StudentPortal() {
               placeholder="Describe your complaint in detail..."
               required
               rows={6}
-              className="w-full px-4 py-2 rounded bg-white bg-opacity-10 text-white border border-gray-600 focus:border-white focus:outline-none"
+              className="w-full px-4 py-2 rounded-lg bg-white bg-opacity-10 text-white border border-gray-600 focus:border-white focus:outline-none placeholder-gray-400 font-sans"
             />
           </div>
 

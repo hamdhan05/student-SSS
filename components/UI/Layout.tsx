@@ -48,11 +48,11 @@ export default function Layout({
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Mobile Header with Hamburger */}
-      <div className="md:hidden bg-black bg-opacity-90 p-4 flex items-center justify-between border-b border-gray-700 sticky top-0 z-40">
-        <h1 className="text-xl font-bold text-white">{title}</h1>
+      <div className="md:hidden bg-white dark:bg-black dark:bg-opacity-90 p-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h1>
         <button
           onClick={toggleSidebar}
-          className="text-white p-2 focus:outline-none"
+          className="text-gray-600 dark:text-white p-2 focus:outline-none"
           aria-label="Toggle menu"
         >
           <svg
@@ -95,7 +95,7 @@ export default function Layout({
         className={`
           fixed md:sticky z-50
           top-0 left-0 h-screen w-64
-          bg-white dark:bg-black dark:bg-opacity-95 md:bg-gray-100 md:dark:bg-opacity-60 backdrop-blur-xl
+          bg-surface dark:bg-black/95 backdrop-blur-xl
           border-r border-gray-200 dark:border-gray-700
           flex flex-col
           transition-transform duration-300 ease-in-out
@@ -150,9 +150,9 @@ export default function Layout({
                     }
                     closeSidebar();
                   }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded transition-colors ${activeTab === tab.id
-                    ? 'bg-black text-white font-bold dark:bg-white dark:bg-opacity-20 dark:text-white shadow-inner'
-                    : 'text-black dark:text-gray-400 hover:bg-black hover:bg-opacity-5 dark:hover:bg-white dark:hover:bg-opacity-10'
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium ${activeTab === tab.id
+                    ? 'bg-brand text-white shadow-md shadow-indigo-200 dark:bg-white/20 dark:text-white dark:shadow-none'
+                    : 'text-gray-600 hover:bg-brand-light hover:text-brand dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white'
                     }`}
                 >
                   <span className="text-xl">{tab.icon}</span>
@@ -191,7 +191,7 @@ export default function Layout({
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto bg-white bg-opacity-60 dark:bg-black dark:bg-opacity-50 min-h-[calc(100vh-64px)] md:min-h-screen w-full transition-colors duration-300">
+      <main className="flex-1 overflow-auto bg-transparent dark:bg-black dark:bg-opacity-50 min-h-[calc(100vh-64px)] md:min-h-screen w-full transition-colors duration-300">
         <div className="p-4 md:p-8 w-full max-w-7xl mx-auto">
           {children}
         </div>

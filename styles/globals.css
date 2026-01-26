@@ -4,27 +4,13 @@
 
 /* Base Theme */
 body {
-  @apply bg-transparent text-gray-900 dark:text-white;
+  @apply bg-canvas text-gray-600 antialiased;
+  @apply dark:bg-transparent dark:text-white;
   margin: 0;
   padding: 0;
-  font-family: -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    'Roboto',
-    'Oxygen',
-    'Ubuntu',
-    'Cantarell',
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  position: relative;
-  min-height: 100vh;
 }
 
-/* Blurred school background */
+/* Blurred school background - Dark Mode Only */
 body::before {
   content: '';
   position: fixed;
@@ -34,17 +20,20 @@ body::before {
   background-position: center;
   background-repeat: no-repeat;
   z-index: -1;
+  opacity: 0;
+  /* Hidden by default (Light Mode) */
+  transition: opacity 0.3s ease;
 }
 
-/* Dark Mode: Darken and Blur */
+/* Dark Mode: Show and blur background */
 .dark body::before {
+  opacity: 1;
   filter: blur(6px) brightness(0.45);
 }
 
-/* Light Mode: Darkened Blur (matching dark mode style) */
+/* Light Mode: No background image, just clean canvas */
 body:not(.dark)::before {
-  filter: blur(6px) brightness(0.6);
-  background-color: transparent;
+  display: none;
 }
 
 /* Ensure all containers have proper layering */
@@ -62,46 +51,42 @@ a {
   text-decoration: none;
 }
 
-/* Custom scrollbar for black & white theme */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  @apply bg-canvas dark:bg-[#1a1a1a];
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #4a4a4a;
-  border-radius: 4px;
+  @apply bg-gray-300 dark:bg-[#4a4a4a] rounded;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #666;
+  @apply bg-gray-400 dark:bg-[#666];
 }
 
-/* Force black & white theme on inputs and selects */
+/* 
+   Clean Campus Theme Implementation 
+   We use @apply to handle both Light (Default) and Dark modes.
+*/
+
+/* Inputs, Selects, Textareas */
 input,
 select,
 textarea {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border: 1px solid #4a4a4a;
-  border-radius: 8px;
+  @apply bg-surface text-gray-600 border border-gray-200 rounded-lg shadow-sm placeholder-gray-400 transition-all duration-200;
+  @apply focus:ring-2 focus:ring-brand-light focus:border-brand focus:outline-none;
+  @apply dark:bg-white/10 dark:text-white dark:border-gray-600 dark:focus:ring-blue-900 dark:focus:border-blue-500;
 }
 
-input::placeholder,
-textarea::placeholder {
-  color: #888;
-}
-
-/* Card styling for black & white */
+/* Card Styling */
 .card {
-  background: rgba(0, 0, 0, 0.7);
-  border: 1px solid #333;
-  backdrop-filter: blur(10px);
-  border-radius: 10px;
+  @apply bg-surface border border-gray-100 shadow-sm rounded-xl transition-all duration-200;
+  @apply dark:bg-black/70 dark:border-gray-800 dark:backdrop-blur-xl dark:shadow-none;
 }
 
 /* Table styling */
@@ -113,15 +98,16 @@ table {
 }
 
 th {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-weight: 600;
+  @apply bg-gray-50 text-gray-600 font-semibold text-left px-6 py-4;
+  @apply dark:bg-white/10 dark:text-white;
 }
 
 tr {
-  border-bottom: 1px solid #333;
+  @apply border-b border-gray-100 last:border-0;
+  @apply dark:border-gray-800;
 }
 
 td {
-  color: #e0e0e0;
+  @apply text-gray-600 px-6 py-4;
+  @apply dark:text-gray-300;
 }

@@ -5,7 +5,7 @@ import CalendarComponent from '@/components/UI/Calendar';
 
 export default function Calendar() {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  
+
   const { data: holidays = [] } = useQuery({
     queryKey: ['holidays'],
     queryFn: () => getHolidays(),
@@ -18,7 +18,7 @@ export default function Calendar() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold text-white">Academic Calendar</h2>
+      <h2 className="text-3xl font-bold text-gray-600 dark:text-white">Academic Calendar</h2>
 
       {todayHoliday && (
         <div className="card p-6 bg-yellow-900 bg-opacity-30 border-yellow-600">
@@ -30,8 +30,8 @@ export default function Calendar() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Calendar Component */}
         <div className="card p-6">
-          <h3 className="text-xl font-semibold text-white mb-4">Calendar View</h3>
-          <CalendarComponent 
+          <h3 className="text-xl font-semibold text-gray-600 dark:text-white mb-4">Calendar View</h3>
+          <CalendarComponent
             selectedDate={selectedDate}
             onDateChange={setSelectedDate}
           />
@@ -39,7 +39,7 @@ export default function Calendar() {
 
         {/* Holidays List */}
         <div className="card p-6">
-          <h3 className="text-xl font-semibold text-white mb-4">Upcoming Holidays</h3>
+          <h3 className="text-xl font-semibold text-gray-600 dark:text-white mb-4">Upcoming Holidays</h3>
           <div className="space-y-3 max-h-[500px] overflow-y-auto">
             {holidays
               .filter((h) => new Date(h.date) >= new Date())
@@ -47,7 +47,7 @@ export default function Calendar() {
                 <div key={holiday.id} className="p-4 bg-white bg-opacity-5 rounded border border-gray-700">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold text-white">{holiday.name}</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">{holiday.name}</h4>
                       <p className="text-sm text-gray-400">
                         {new Date(holiday.date).toLocaleDateString('en-US', {
                           weekday: 'long',

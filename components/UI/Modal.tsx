@@ -35,7 +35,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', s
     sm: 'max-w-md',
     md: 'max-w-lg',
     lg: 'max-w-2xl',
-    xl: 'max-w-4xl',
+    xl: 'max-w-5xl',
   };
 
   return (
@@ -49,7 +49,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', s
       {/* Modal */}
       <div
         ref={modalRef}
-        className={`relative bg-white/90 dark:bg-gray-900/95 rounded-lg shadow-2xl ${sizeStyles[size]} w-full max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700 backdrop-blur-xl transition-colors duration-300`}
+        className={`relative bg-white dark:bg-black/80 rounded-lg shadow-2xl ${sizeStyles[size]} w-full max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700 backdrop-blur-xl transition-colors duration-300 text-gray-900 dark:text-white`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
