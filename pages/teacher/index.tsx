@@ -173,38 +173,37 @@ export default function TeacherPortal() {
     >
       <div className="max-w-7xl mx-auto p-0 rounded-lg">
         {activeTab === 'timetable' ? (
-          <div className="card p-6 overflow-x-auto">
-            <h2 className="text-2xl font-bold text-white mb-6">Weekly Timetable</h2>
+          <div className="card p-6 overflow-x-auto bg-white dark:bg-black/40 border border-gray-200 dark:border-white/10">
+            <h2 className="text-2xl font-bold text-gray-600 dark:text-white mb-6">Weekly Timetable</h2>
             <div className="min-w-full inline-block align-middle">
-              <div className="border border-gray-700 rounded-lg overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-700">
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead>
-                    <tr className="bg-black bg-opacity-30">
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider border-r border-gray-700">Time</th>
+                    <tr className="bg-gray-50 dark:bg-black/30">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700">Time</th>
                       {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => (
-                        <th key={day} className="px-6 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider border-r border-gray-700 last:border-r-0">{day}</th>
+                        <th key={day} className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700 last:border-r-0">{day}</th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-700">
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                     {['09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00', '12:00 - 01:00', '01:00 - 02:00', '02:00 - 03:00'].map((time, i) => (
-                      <tr key={time} className={i % 2 === 0 ? 'bg-white bg-opacity-5' : ''}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300 border-r border-gray-700">{time}</td>
+                      <tr key={time} className={i % 2 === 0 ? 'bg-gray-50/50 dark:bg-white/5' : ''}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-300 border-r border-gray-200 dark:border-gray-700">{time}</td>
                         {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day, j) => {
-                          // Deterministic pseudo-random distribution of assigned classes
-                          const hasClass = assignedClasses.length > 0 && (i + j + assignedClasses.length) % 3 !== 0; // Some gaps
+                          const hasClass = assignedClasses.length > 0 && (i + j + assignedClasses.length) % 3 !== 0;
                           const classIndex = (i + j) % assignedClasses.length;
                           const assignedClass = hasClass ? assignedClasses[classIndex] : null;
 
                           return (
-                            <td key={day} className="px-6 py-4 whitespace-nowrap text-center border-r border-gray-700 last:border-r-0">
+                            <td key={day} className="px-6 py-4 whitespace-nowrap text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0">
                               {assignedClass ? (
-                                <div className="flex flex-col">
+                                <div className="flex flex-col text-gray-600 dark:text-white">
                                   <span className="font-bold">Class {assignedClass}</span>
-                                  <span className="text-xs opacity-75">Room {100 + Number(assignedClass.replace(/\D/g, ''))}</span>
+                                  <span className="text-xs text-gray-500 dark:text-gray-400 opacity-75">Room {100 + Number(assignedClass.replace(/\D/g, ''))}</span>
                                 </div>
                               ) : (
-                                <span className="text-gray-600 text-xs">-</span>
+                                <span className="text-gray-400 dark:text-gray-600 text-xs">-</span>
                               )}
                             </td>
                           );
@@ -219,46 +218,46 @@ export default function TeacherPortal() {
         ) : activeTab === 'dashboard' ? (
           /* Attendance Section */
           <div className="space-y-6">
-            <div className="card p-6">
+            <div className="card p-6 bg-white dark:bg-black/40 border border-gray-200 dark:border-white/10">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-white">Mark Attendance</h2>
+                <h2 className="text-2xl font-bold text-gray-600 dark:text-white">Mark Attendance</h2>
                 {assignedClasses.length > 0 && (
-                  <div className="px-4 py-2 bg-blue-500 bg-opacity-20 rounded-lg border border-blue-500 border-opacity-30">
-                    <span className="text-blue-300 text-sm font-medium">Assigned Classes: </span>
-                    <span className="text-white font-bold">{assignedClasses.join(', ')}</span>
+                  <div className="px-4 py-2 bg-blue-50 dark:bg-blue-500/20 rounded-lg border border-blue-200 dark:border-blue-500/30">
+                    <span className="text-blue-600 dark:text-blue-300 text-sm font-medium">Assigned Classes: </span>
+                    <span className="text-blue-800 dark:text-white font-bold">{assignedClasses.join(', ')}</span>
                   </div>
                 )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div>
-                  <label htmlFor="date-input" className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Date</label>
+                  <label htmlFor="date-input" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date</label>
                   <Input
                     id="date-input"
                     name="date"
                     type="date"
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 px-4 py-2 rounded w-full"
+                    className="bg-white dark:bg-gray-800 text-gray-600 dark:text-white border border-gray-300 dark:border-gray-600 px-4 py-2 rounded w-full"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="class-select" className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Class</label>
+                  <label htmlFor="class-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Class</label>
                   <select
                     id="class-select"
                     name="class"
                     value={selectedClass}
                     onChange={(e) => {
                       setSelectedClass(Number(e.target.value));
-                      setSelectedSection(''); // Reset section when class changes
+                      setSelectedSection('');
                     }}
                     style={{ colorScheme: 'light dark' }}
-                    className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                   >
-                    <option value={0} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select Class</option>
+                    <option value={0} className="bg-white dark:bg-gray-800 text-gray-600 dark:text-white">Select Class</option>
                     {availableClasses.map((cls: any) => (
-                      <option key={cls} value={cls} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                      <option key={cls} value={cls} className="bg-white dark:bg-gray-800 text-gray-600 dark:text-white">
                         Class {cls}
                       </option>
                     ))}
@@ -266,19 +265,19 @@ export default function TeacherPortal() {
                 </div>
 
                 <div>
-                  <label htmlFor="section-select" className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">Section</label>
+                  <label htmlFor="section-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Section</label>
                   <select
                     id="section-select"
                     name="section"
                     value={selectedSection}
                     onChange={(e) => setSelectedSection(e.target.value)}
                     style={{ colorScheme: 'light dark' }}
-                    className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                     disabled={!selectedClass}
                   >
-                    <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select Section</option>
+                    <option value="" className="bg-white dark:bg-gray-800 text-gray-600 dark:text-white">Select Section</option>
                     {availableSections.map((sec: any) => (
-                      <option key={sec} value={sec} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                      <option key={sec} value={sec} className="bg-white dark:bg-gray-800 text-gray-600 dark:text-white">
                         Section {sec}
                       </option>
                     ))}
@@ -297,45 +296,50 @@ export default function TeacherPortal() {
             </div>
 
             {studentsLoading ? (
-              <div className="card p-8 text-center text-gray-400">Loading students...</div>
+              <div className="card p-8 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-black/40 border border-gray-200 dark:border-white/10">Loading students...</div>
             ) : (
               <>
-                <div className="card overflow-hidden">
+                <div className="card overflow-hidden bg-white dark:bg-black/40 border border-gray-200 dark:border-white/10">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-700">
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-white">Roll No</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-white">Student Name</th>
-                        <th className="px-6 py-4 text-center text-sm font-semibold text-white">Attendance</th>
-                        <th className="px-6 py-4 text-center text-sm font-semibold text-white">Actions</th>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-white">Roll No</th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-white">Student Name</th>
+                        <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600 dark:text-white">Attendance</th>
+                        <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600 dark:text-white">Actions</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                       {studentsData?.data.map((student: any) => {
                         const status = attendanceMarks[student.id] || 'present';
+                        // Determine button styles based on status and theme
+                        // Present Button
+                        const presentBtnClass = status === 'present'
+                          ? 'bg-green-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700';
+
+                        // Absent Button
+                        const absentBtnClass = status === 'absent'
+                          ? 'bg-red-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700';
+
                         return (
-                          <tr key={student.id} className="border-b border-gray-800 hover:bg-white hover:bg-opacity-5">
-                            <td className="px-6 py-4 text-sm text-gray-300">{student.rollNumber}</td>
-                            <td className="px-6 py-4 text-sm text-white font-medium">{student.name}</td>
+                          <tr key={student.id} className="hover:bg-gray-50 dark:hover:bg-white/5">
+                            <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{student.rollNumber}</td>
+                            <td className="px-6 py-4 text-sm text-gray-600 dark:text-white font-medium">{student.name}</td>
                             <td className="px-6 py-4 text-center">
                               <div className="flex items-center justify-center gap-4">
                                 <button
                                   onClick={() =>
                                     setAttendanceMarks((prev) => ({ ...prev, [student.id]: 'present' }))
                                   }
-                                  className={`px-4 py-2 rounded font-medium transition-colors ${status === 'present'
-                                    ? 'bg-green-700 text-white'
-                                    : 'bg-gray-800 text-white hover:bg-gray-700'
-                                    }`}
+                                  className={`px-4 py-2 rounded font-medium transition-colors ${presentBtnClass}`}
                                 >
                                   Present
                                 </button>
                                 <button
                                   onClick={() => setAttendanceMarks((prev) => ({ ...prev, [student.id]: 'absent' }))}
-                                  className={`px-4 py-2 rounded font-medium transition-colors ${status === 'absent'
-                                    ? 'bg-red-700 text-white'
-                                    : 'bg-gray-800 text-white hover:bg-gray-700'
-                                    }`}
+                                  className={`px-4 py-2 rounded font-medium transition-colors ${absentBtnClass}`}
                                 >
                                   Absent
                                 </button>
@@ -344,7 +348,7 @@ export default function TeacherPortal() {
                             <td className="px-6 py-4 text-center">
                               <button
                                 onClick={() => setViewStudentId(student.id)}
-                                className="text-white hover:text-gray-300 text-sm"
+                                className="text-blue-600 hover:text-blue-800 dark:text-white dark:hover:text-gray-300 text-sm font-medium"
                               >
                                 View
                               </button>
@@ -360,7 +364,7 @@ export default function TeacherPortal() {
                   <Button
                     onClick={handleSubmitAttendance}
                     disabled={markAttendanceMutation.isPending || Object.keys(attendanceMarks).length === 0}
-                    className="bg-white text-black hover:bg-gray-200 px-8 py-3 text-lg"
+                    className="bg-gray-900 text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 px-8 py-3 text-lg"
                   >
                     {markAttendanceMutation.isPending ? 'Submitting...' : 'Submit Attendance'}
                   </Button>
@@ -383,8 +387,6 @@ export default function TeacherPortal() {
         )
       }
 
-
-
       {activeTab === 'homework' && (
         <TeacherHomework assignedClasses={assignedClasses} />
       )}
@@ -395,22 +397,22 @@ export default function TeacherPortal() {
 
       {activeTab === 'notices' && (
         <div className="space-y-6">
-          <h2 className="text-3xl font-bold text-white">Notice Board</h2>
+          <h2 className="text-3xl font-bold text-gray-600 dark:text-white">Notice Board</h2>
           <div className="space-y-4">
             {notices.map((notice: any) => (
-              <div key={notice.id} className="card p-6 border-l-4 border-yellow-500">
+              <div key={notice.id} className="card p-6 border-l-4 border-yellow-500 bg-white dark:bg-black/40 shadow-sm dark:shadow-none border-y border-r border-gray-200 dark:border-white/10">
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xl font-bold text-white">{notice.title}</h3>
-                  <span className="text-sm text-gray-400">
+                  <h3 className="text-xl font-bold text-gray-600 dark:text-white">{notice.title}</h3>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     {new Date(notice.date || notice.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-gray-300 whitespace-pre-wrap">{notice.content}</p>
-                <div className="mt-4 text-xs text-gray-500">Posted by: {notice.createdBy}</div>
+                <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{notice.content}</p>
+                <div className="mt-4 text-xs text-gray-500 dark:text-gray-500">Posted by: {notice.createdBy}</div>
               </div>
             ))}
             {notices.length === 0 && (
-              <div className="card p-8 text-center text-gray-400">No notices available</div>
+              <div className="card p-8 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-black/40 border border-gray-200 dark:border-white/10">No notices available</div>
             )}
           </div>
         </div>

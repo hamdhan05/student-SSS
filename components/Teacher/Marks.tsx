@@ -93,72 +93,72 @@ export default function TeacherMarks({ assignedClasses }: TeacherMarksProps) {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white">Academic Marks Entry</h2>
+            <h2 className="text-2xl font-bold text-gray-600 dark:text-white">Academic Marks Entry</h2>
 
-            <div className="card p-6">
+            <div className="card p-6 bg-white dark:bg-black/40 border border-gray-200 dark:border-white/10">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Class</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Class</label>
                         <select
                             value={selectedClass}
                             onChange={(e) => {
                                 setSelectedClass(e.target.value);
                                 setSelectedSection('');
                             }}
-                            className="w-full px-4 py-2 rounded bg-white bg-opacity-10 text-white border border-gray-600"
+                            className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Select Class</option>
                             {availableClasses.map(cls => (
-                                <option key={cls} value={cls} className="bg-black">Class {cls}</option>
+                                <option key={cls} value={cls}>Class {cls}</option>
                             ))}
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Section</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Section</label>
                         <select
                             value={selectedSection}
                             onChange={(e) => setSelectedSection(e.target.value)}
-                            className="w-full px-4 py-2 rounded bg-white bg-opacity-10 text-white border border-gray-600"
+                            className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             disabled={!selectedClass}
                         >
                             <option value="">Select Section</option>
                             {selectedClass && getSectionsForClass(selectedClass).map(sec => (
-                                <option key={sec} value={sec} className="bg-black">Section {sec}</option>
+                                <option key={sec} value={sec}>Section {sec}</option>
                             ))}
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Subject</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject</label>
                         <Input
                             value={selectedSubject}
                             onChange={(e) => setSelectedSubject(e.target.value)}
                             placeholder="e.g. Mathematics"
-                            className="bg-white bg-opacity-10 text-white"
+                            className="bg-white dark:bg-gray-800 text-gray-600 dark:text-white border border-gray-300 dark:border-gray-600"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Term</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Term</label>
                         <select
                             value={selectedTerm}
                             onChange={(e) => setSelectedTerm(e.target.value)}
-                            className="w-full px-4 py-2 rounded bg-white bg-opacity-10 text-white border border-gray-600"
+                            className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                            <option value="Term 1" className="bg-black">Term 1</option>
-                            <option value="Term 2" className="bg-black">Term 2</option>
-                            <option value="Term 3" className="bg-black">Term 3</option>
-                            <option value="Final" className="bg-black">Final</option>
+                            <option value="Term 1">Term 1</option>
+                            <option value="Term 2">Term 2</option>
+                            <option value="Term 3">Term 3</option>
+                            <option value="Final">Final</option>
                         </select>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-4 mb-6">
                     <div className="w-32">
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Total Marks</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Total Marks</label>
                         <Input
                             type="number"
                             value={totalMarks}
                             onChange={(e) => setTotalMarks(Number(e.target.value))}
-                            className="bg-white bg-opacity-10 text-white"
+                            className="bg-white dark:bg-gray-800 text-gray-600 dark:text-white border border-gray-300 dark:border-gray-600"
                         />
                     </div>
                     <div className="pt-7">
@@ -167,22 +167,22 @@ export default function TeacherMarks({ assignedClasses }: TeacherMarksProps) {
                 </div>
 
                 {studentsLoading ? (
-                    <div className="p-8 text-center text-gray-400">Loading students...</div>
+                    <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading students...</div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
+                    <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                        <table className="w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead>
-                                <tr className="border-b border-gray-700">
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Roll No</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Name</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Marks (/{totalMarks})</th>
+                                <tr className="bg-gray-50 dark:bg-black/30">
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-white">Roll No</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-white">Name</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-white">Marks (/{totalMarks})</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-700">
+                            <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-transparent">
                                 {students.map((student: any) => (
-                                    <tr key={student.id} className="hover:bg-white hover:bg-opacity-5">
-                                        <td className="px-6 py-4 text-sm text-gray-300">{student.rollNumber}</td>
-                                        <td className="px-6 py-4 text-sm text-white">{student.name}</td>
+                                    <tr key={student.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{student.rollNumber}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-white">{student.name}</td>
                                         <td className="px-6 py-4">
                                             <input
                                                 type="number"
@@ -190,7 +190,7 @@ export default function TeacherMarks({ assignedClasses }: TeacherMarksProps) {
                                                 max={totalMarks}
                                                 value={marksData[student.id] || ''}
                                                 onChange={(e) => handleMarkChange(student.id, e.target.value)}
-                                                className="w-24 px-3 py-1 bg-white bg-opacity-10 text-white rounded border border-gray-600 focus:border-blue-500 outline-none"
+                                                className="w-24 px-3 py-1 bg-white dark:bg-white/10 text-gray-600 dark:text-white rounded border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
                                                 placeholder="-"
                                             />
                                         </td>
@@ -199,14 +199,14 @@ export default function TeacherMarks({ assignedClasses }: TeacherMarksProps) {
                             </tbody>
                         </table>
                         {students.length > 0 && (
-                            <div className="mt-8 flex justify-end">
+                            <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end bg-gray-50 dark:bg-black/20">
                                 <Button onClick={handleSubmit} disabled={updateMutation.isPending} className="px-8 flex-shrink-0">
                                     {updateMutation.isPending ? 'Saving...' : 'Save Marks'}
                                 </Button>
                             </div>
                         )}
                         {students.length === 0 && selectedClass && (
-                            <div className="p-8 text-center text-gray-400">No students found in this class.</div>
+                            <div className="p-8 text-center text-gray-500 dark:text-gray-400">No students found in this class.</div>
                         )}
                     </div>
                 )}
