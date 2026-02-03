@@ -191,7 +191,7 @@ export default function Layout({
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto bg-transparent dark:bg-black dark:bg-opacity-50 min-h-[calc(100vh-64px)] md:min-h-screen w-full transition-colors duration-300">
+      <main className="flex-1 overflow-auto bg-transparent dark:bg-black dark:bg-opacity-20 min-h-[calc(100vh-64px)] md:min-h-screen w-full transition-colors duration-300">
         <div className="p-4 md:p-8 w-full max-w-7xl mx-auto">
           {children}
         </div>

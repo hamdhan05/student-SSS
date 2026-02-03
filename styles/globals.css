@@ -28,7 +28,7 @@ body::before {
 /* Dark Mode: Show and blur background */
 .dark body::before {
   opacity: 1;
-  filter: blur(6px) brightness(0.45);
+  filter: blur(4px) brightness(0.7);
 }
 
 /* Light Mode: No background image, just clean canvas */
@@ -37,10 +37,7 @@ body:not(.dark)::before {
 }
 
 /* Ensure all containers have proper layering */
-#__next {
-  position: relative;
-  z-index: 1;
-}
+/* #__next z-index removed to fix background visibility */
 
 * {
   box-sizing: border-box;
