@@ -23,19 +23,19 @@ export async function sendSMS(phoneNumber: string, message: string): Promise<Sen
         return { success: false, message: "Server configuration missing" };
     }
 
-    // Ensure serverUrl doesn't end with a slash for consistent path joining
+    // Correct TextBee API endpoint: /api/v1/gateway/devices/{deviceId}/send-sms
     const baseUrl = config.serverUrl.replace(/\/$/, "");
+    const endpoint = `${baseUrl}/api/v1/gateway/devices/${config.deviceId}/send-sms`;
 
     try {
-        const response = await fetch(`${baseUrl}/api/send-sms`, {
+        const response = await fetch(endpoint, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${config.apiKey}`,
+                "x-api-key": config.apiKey,   // TextBee uses x-api-key, not Bearer
             },
             body: JSON.stringify({
-                deviceId: config.deviceId,
-                phoneNumber: phoneNumber,
+                recipients: [phoneNumber],     // TextBee uses 'recipients' array
                 message: message,
             }),
         });
