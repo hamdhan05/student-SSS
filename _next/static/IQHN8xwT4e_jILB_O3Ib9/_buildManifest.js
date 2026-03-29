@@ -9,22 +9,22 @@ self.__BUILD_MANIFEST = {
     "static/chunks/fe5b9df25e80e255.js"
   ],
   "/headmaster": [
-    "static/chunks/a0715b8b809acc8e.js"
+    "static/chunks/2ab8dfeca2739aab.js"
   ],
   "/login": [
     "static/chunks/edc9f0bf1a2b39a4.js"
   ],
   "/student": [
-    "static/chunks/54e2f6a95adb9621.js"
+    "static/chunks/fffab878d5099a62.js"
   ],
   "/students/[id]": [
     "static/chunks/c31f604fad89cea5.js"
   ],
   "/teacher": [
-    "static/chunks/31bcfde46b99a99c.js"
+    "static/chunks/7f36e72f40340a8a.js"
   ],
   "/teachers/[id]": [
-    "static/chunks/1fb3e337f62dd0df.js"
+    "static/chunks/f6f2be7aafb9398d.js"
   ],
   "__rewrites": {
     "afterFiles": [],
