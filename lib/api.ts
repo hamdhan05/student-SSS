@@ -593,14 +593,48 @@ export const markAttendanceBatch = async (params: {
     if (error) throw error;
   }
 
-  // SIMULATION: Send SMS (Log only)
+  // Send SMS to parents of absent students via TextBee
+  const absentStudentIds = params.marks
+    .filter(m => m.status === 'absent')
+    .map(m => m.studentId);
+
   let notificationCount = 0;
-  params.marks.forEach(mark => {
-    if (mark.status === 'absent') {
-      notificationCount++;
+
+  if (absentStudentIds.length > 0) {
+    // Fetch name + parent contact for each absent student
+    const { data: absentStudents, error: fetchError } = await supabase
+      .from('students')
+      .select('id, name, parent_name, parent_phone')
+      .in('id', absentStudentIds);
+
+    if (!fetchError && absentStudents) {
+      const formattedDate = new Date(params.date).toLocaleDateString('en-IN', {
+        day: '2-digit', month: 'long', year: 'numeric',
+      });
+
+      for (const student of absentStudents) {
+        if (student.parent_phone) {
+          const message =
+            `Dear ${student.parent_name || 'Parent'}, your child ${student.name} ` +
+            `(Class ${params.classId}-${params.section}) was marked ABSENT on ${formattedDate}. ` +
+            `Please contact the school for more information.`;
+
+          try {
+            await fetch('/api/send-sms', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ phoneNumber: student.parent_phone, message }),
+            });
+            notificationCount++;
+            console.log(`[SMS] Sent absence alert to parent of ${student.name}`);
+          } catch (smsError) {
+            // SMS failure should never block attendance saving
+            console.error(`[SMS] Failed to notify parent of ${student.name}:`, smsError);
+          }
+        }
+      }
     }
-  });
-  console.log(`[Mock SMS] Sent ${notificationCount} ABSENT notifications.`);
+  }
 
   return { success: true, recordsAdded: records.length, notificationCount };
 };
