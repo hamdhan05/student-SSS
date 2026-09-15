@@ -31,7 +31,7 @@ export default function Teachers() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold text-gray-600 dark:text-white">Teachers</h2>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Teachers</h2>
         <Button
           variant="action"
           onClick={() => setIsAddTeacherModalOpen(true)}
@@ -56,7 +56,7 @@ export default function Teachers() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTeachers.map((teacher) => (
-            <div key={teacher.id} className="card bg-white bg-opacity-5 border border-gray-700 p-6 hover:border-blue-500 transition-colors rounded-xl shadow-sm">
+            <div key={teacher.id} className="card p-6 hover:border-blue-500 transition-colors">
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-16 h-16 rounded-full bg-blue-900 bg-opacity-30 text-blue-300 flex items-center justify-center text-2xl font-bold overflow-hidden border border-gray-600">
                   {teacher.photo && teacher.photo !== '/images/teachers/default.jpg' ? (
@@ -66,20 +66,20 @@ export default function Teachers() {
                   )}
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-600 dark:text-white">{teacher.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{teacher.subject || teacher.domain}</p>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{teacher.name}</h3>
+                  <p className="text-sm text-gray-700 dark:text-gray-400">{teacher.subject || teacher.domain}</p>
                 </div>
               </div>
 
-              <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+              <div className="space-y-2 text-sm text-gray-900 dark:text-gray-300">
                 <p>
-                  <span className="text-gray-400">Email:</span> {teacher.email}
+                  <span className="text-gray-500 dark:text-gray-400">Email:</span> {teacher.email}
                 </p>
                 <p>
-                  <span className="text-gray-400">Phone:</span> {maskPhoneNumber(teacher.phone)}
+                  <span className="text-gray-500 dark:text-gray-400">Phone:</span> {maskPhoneNumber(teacher.phone)}
                 </p>
                 <p>
-                  <span className="text-gray-400">Classes:</span> {teacher.classes?.join(', ') || 'Not assigned'}
+                  <span className="text-gray-500 dark:text-gray-400">Classes:</span> {teacher.classes?.join(', ') || 'Not assigned'}
                 </p>
               </div>
 

@@ -118,7 +118,7 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Personal Information */}
                 {/* Personal Information */}
-                <div className="bg-white dark:bg-white dark:bg-opacity-5 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+                <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
                         <span className="p-2 rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-500 dark:bg-opacity-20 dark:text-blue-400">👤</span>
                         Personal Information
@@ -161,7 +161,6 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
-                                className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
                         <div>
@@ -172,7 +171,6 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 onChange={handleChange}
                                 required
                                 placeholder="e.g. Mathematics"
-                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div>
@@ -183,7 +181,6 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
-                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div>
@@ -193,7 +190,6 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 value={formData.phone}
                                 onChange={handleChange}
                                 required
-                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div>
@@ -205,7 +201,6 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 onChange={handleChange}
                                 required
                                 max={new Date().toISOString().split('T')[0]}
-                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div className="md:col-span-2">
@@ -215,16 +210,16 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 value={formData.address}
                                 onChange={handleChange}
                                 rows={2}
-                                className="w-full px-4 py-2 rounded-lg bg-white bg-opacity-10 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* Professional & Family Information */}
-                <div className="bg-white dark:bg-white dark:bg-opacity-5 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+                <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                        <span className="p-2 rounded-lg bg-purple-100 text-purple-600 dark:bg-purple-500 dark:bg-opacity-20 dark:text-purple-400">🎓</span>
+                        <span className="p-2 rounded-lg bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400">🎓</span>
                         Professional & Family
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -235,7 +230,6 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 value={formData.qualification}
                                 onChange={handleChange}
                                 required
-                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div>
@@ -246,7 +240,6 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 onChange={handleChange}
                                 required
                                 placeholder="e.g. 5 years"
-                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div>
@@ -256,7 +249,6 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 value={formData.fatherName}
                                 onChange={handleChange}
                                 required
-                                className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             />
                         </div>
                         <div>
@@ -265,7 +257,6 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                                 name="motherName"
                                 value={formData.motherName}
                                 onChange={handleChange}
-                                className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
                     </div>
@@ -315,12 +306,12 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
 
                     <div className="flex flex-wrap gap-2">
                         {formData.classes.map((cls) => (
-                            <div key={cls} className="flex items-center gap-2 px-3 py-1 bg-black bg-opacity-30 rounded-full border border-gray-600">
-                                <span className="text-white text-sm font-medium">{cls}</span>
+                            <div key={cls} className="flex items-center gap-2 px-3 py-1 bg-black bg-opacity-10 dark:bg-opacity-30 rounded-full border border-gray-300 dark:border-gray-600">
+                                <span className="text-gray-900 dark:text-white text-sm font-medium">{cls}</span>
                                 <button
                                     type="button"
                                     onClick={() => removeClass(cls)}
-                                    className="text-gray-400 hover:text-white"
+                                    className="text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-white transition-colors"
                                 >
                                     ×
                                 </button>
@@ -344,7 +335,6 @@ export default function AddTeacherModal({ isOpen, onClose }: AddTeacherModalProp
                     <Button
                         type="submit"
                         disabled={createTeacherMutation.isPending}
-                        className="!bg-gray-900 !text-white hover:!bg-gray-800 dark:!bg-white dark:!text-black dark:hover:!bg-gray-200"
                     >
                         {createTeacherMutation.isPending ? 'Adding...' : 'Add Teacher'}
                     </Button>

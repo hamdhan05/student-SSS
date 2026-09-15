@@ -60,15 +60,15 @@ export default function FeeEditModal({ isOpen, onClose, student, initialTerms }:
         <Modal isOpen={isOpen} onClose={onClose} title={`Edit Fees: ${student.name} (${student.rollNumber})`}>
             <div className="space-y-6">
                 {terms.map((term, index) => (
-                    <div key={index} className="bg-white bg-opacity-5 p-4 rounded border border-gray-700">
-                        <h4 className="text-white font-bold mb-3">{term.name}</h4>
+                    <div key={index} className="bg-gray-50 dark:bg-white/5 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+                        <h4 className="text-gray-900 dark:text-white font-bold mb-3">{term.name}</h4>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-gray-400 text-sm mb-1">Status</label>
+                                <label className="block text-gray-700 dark:text-gray-300 text-sm mb-1">Status</label>
                                 <select
                                     value={term.status}
                                     onChange={(e) => handleTermChange(index, 'status', e.target.value)}
-                                    className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-white text-sm"
+                                    className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                                 >
                                     <option value="pending">Pending</option>
                                     <option value="paid">Paid</option>
@@ -76,28 +76,26 @@ export default function FeeEditModal({ isOpen, onClose, student, initialTerms }:
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-gray-400 text-sm mb-1">Amount (₹)</label>
+                                <label className="block text-gray-700 dark:text-gray-300 text-sm mb-1">Amount (₹)</label>
                                 <Input
                                     type="number"
                                     value={term.amount}
                                     onChange={(e) => handleTermChange(index, 'amount', Number(e.target.value))}
-                                    className="bg-black border-gray-600 text-white text-sm py-2"
                                 />
                             </div>
                         </div>
                         <div className="mt-3">
-                            <label className="block text-gray-400 text-sm mb-1">Due Date</label>
+                            <label className="block text-gray-700 dark:text-gray-300 text-sm mb-1">Due Date</label>
                             <Input
                                 type="date"
                                 value={term.dueDate}
                                 onChange={(e) => handleTermChange(index, 'dueDate', e.target.value)}
-                                className="bg-black border-gray-600 text-white text-sm py-2"
                             />
                         </div>
                     </div>
                 ))}
 
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-700">
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <Button variant="secondary" onClick={onClose} disabled={updateMutation.isPending}>
                         Cancel
                     </Button>

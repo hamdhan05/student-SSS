@@ -162,9 +162,9 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
           )}
 
           {/* Personal Information */}
-          <div className="bg-white bg-opacity-5 p-6 rounded-xl border border-gray-700">
-            <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-              <span className="p-2 bg-blue-500 bg-opacity-20 rounded-lg text-blue-400">👤</span>
+          <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
+              <span className="p-2 rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">👤</span>
               Personal Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -174,7 +174,6 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="bg-white bg-opacity-10 text-white"
               />
               <Input
                 label="Roll Number"
@@ -182,29 +181,26 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
                 value={formData.rollNumber}
                 onChange={handleChange}
                 required
-                className="bg-white bg-opacity-10 text-white"
               />
               <Input
                 label="Admission Number"
                 name="admissionNumber"
                 value={formData.admissionNumber}
                 onChange={handleChange}
-                className="bg-white bg-opacity-10 text-white"
               />
               <Input
                 label="EMIS Number"
                 name="emisNumber"
                 value={formData.emisNumber}
                 onChange={handleChange}
-                className="bg-white bg-opacity-10 text-white"
               />
               <div className="flex flex-col">
-                <label className="text-sm font-medium text-gray-300 mb-1">Gender</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gender</label>
                 <select
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                 >
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -218,7 +214,6 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="bg-white bg-opacity-10 text-white"
               />
               <Input
                 label="Phone"
@@ -226,7 +221,6 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
                 value={formData.phone}
                 onChange={handleChange}
                 required
-                className="bg-white bg-opacity-10 text-white"
               />
               <Input
                 type="date"
@@ -234,7 +228,6 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
                 name="dateOfBirth"
                 value={formData.dateOfBirth}
                 onChange={handleChange}
-                className="bg-white bg-opacity-10 text-white"
               />
               <Input
                 label="Class"
@@ -242,7 +235,6 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
                 value={formData.class}
                 onChange={handleChange}
                 required
-                className="bg-white bg-opacity-10 text-white"
               />
               <Input
                 label="Section"
@@ -250,16 +242,15 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
                 value={formData.section}
                 onChange={handleChange}
                 required
-                className="bg-white bg-opacity-10 text-white"
               />
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-300 mb-1">Address</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
                 <textarea
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
                   rows={2}
-                  className="w-full px-4 py-2 rounded-lg bg-white bg-opacity-10 text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                  className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
                 />
               </div>
             </div>
@@ -267,9 +258,9 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
 
 
           {/* Parent/Guardian Information */}
-          <div className="bg-white bg-opacity-5 p-6 rounded-xl border border-gray-700">
-            <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-              <span className="p-2 bg-green-500 bg-opacity-20 rounded-lg text-green-400">👨‍👩‍👧</span>
+          <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
+              <span className="p-2 rounded-lg bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400">👨‍👩‍👧</span>
               Parent Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -279,7 +270,6 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
                 value={formData.parentName}
                 onChange={handleChange}
                 required
-                className="bg-white bg-opacity-10 text-white"
               />
               <Input
                 label="Parent Phone"
@@ -287,34 +277,30 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
                 value={formData.parentPhone}
                 onChange={handleChange}
                 required
-                className="bg-white bg-opacity-10 text-white"
               />
               <Input
                 label="Parent Email"
                 name="parentEmail"
                 value={formData.parentEmail}
                 onChange={handleChange}
-                className="bg-white bg-opacity-10 text-white"
               />
               <Input
                 label="Guardian Name"
                 name="guardianName"
                 value={formData.guardianName}
                 onChange={handleChange}
-                className="bg-white bg-opacity-10 text-white"
               />
               <Input
                 label="Guardian Phone"
                 name="guardianPhone"
                 value={formData.guardianPhone}
                 onChange={handleChange}
-                className="bg-white bg-opacity-10 text-white"
               />
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-700">
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <Button
               type="button"
               onClick={onClose}
@@ -326,7 +312,6 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
             <Button
               type="submit"
               disabled={updateStudentMutation.isPending}
-              className="bg-white text-black hover:bg-gray-200"
             >
               {updateStudentMutation.isPending ? 'Saving...' : 'Save Changes'}
             </Button>

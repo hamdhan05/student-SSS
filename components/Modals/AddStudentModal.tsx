@@ -130,7 +130,7 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
 
                 {/* Personal Information */}
                 {/* Personal Information */}
-                <div className="bg-white dark:bg-white dark:bg-opacity-5 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+                <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
                         <span className="p-2 bg-blue-100 text-blue-600 dark:bg-blue-500 dark:bg-opacity-20 rounded-lg dark:text-blue-400">👤</span>
                         Personal Information
@@ -163,7 +163,6 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             value={formData.name}
                             onChange={handleChange}
                             required
-                            className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             placeholder="Ex: John Doe"
                         />
                         <Input
@@ -172,21 +171,18 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             value={formData.rollNumber}
                             onChange={handleChange}
                             required
-                            className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                         />
                         <Input
                             label="Admission Number"
                             name="admissionNumber"
                             value={formData.admissionNumber}
                             onChange={handleChange}
-                            className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                         />
                         <Input
                             label="EMIS Number"
                             name="emisNumber"
                             value={formData.emisNumber}
                             onChange={handleChange}
-                            className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                         />
                         <div className="flex flex-col">
                             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gender</label>
@@ -194,7 +190,7 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                                 name="gender"
                                 value={formData.gender}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 dark:bg-gray-800 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 dark:bg-gray-800 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                             >
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -208,7 +204,6 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             value={formData.email}
                             onChange={handleChange}
                             required
-                            className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                         />
                         <Input
                             label="Phone"
@@ -216,7 +211,6 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             value={formData.phone}
                             onChange={handleChange}
                             required
-                            className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                         />
                         <Input
                             type="date"
@@ -224,7 +218,6 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             name="dateOfBirth"
                             value={formData.dateOfBirth}
                             onChange={handleChange}
-                            className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                         />
                         <Input
                             label="Class"
@@ -232,7 +225,6 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             value={formData.class}
                             onChange={handleChange}
                             required
-                            className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                         />
                         <Input
                             label="Section"
@@ -240,7 +232,6 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             value={formData.section}
                             onChange={handleChange}
                             required
-                            className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                             maxLength={2}
                         />
                         <div className="md:col-span-2">
@@ -250,14 +241,14 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                                 value={formData.address}
                                 onChange={handleChange}
                                 rows={2}
-                                className="w-full px-4 py-2 rounded-lg bg-white bg-opacity-10 text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* Parent/Guardian Information */}
-                <div className="bg-white dark:bg-white dark:bg-opacity-5 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
+                <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-none">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
                         <span className="p-2 bg-green-100 text-green-600 dark:bg-green-500 dark:bg-opacity-20 rounded-lg dark:text-green-400">👨‍👩‍👧</span>
                         Parent Information
@@ -269,7 +260,6 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             value={formData.parentName}
                             onChange={handleChange}
                             required
-                            className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                         />
                         <Input
                             label="Parent Phone"
@@ -277,14 +267,12 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                             value={formData.parentPhone}
                             onChange={handleChange}
                             required
-                            className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                         />
                         <Input
                             label="Parent Email"
                             name="parentEmail"
                             value={formData.parentEmail}
                             onChange={handleChange}
-                            className="bg-white text-gray-900 border-gray-300 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600"
                         />
                     </div>
                 </div>
@@ -302,7 +290,6 @@ export default function AddStudentModal({ isOpen, onClose }: AddStudentModalProp
                     <Button
                         type="submit"
                         disabled={addStudentMutation.isPending}
-                        className="bg-gray-900 text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
                     >
                         {addStudentMutation.isPending ? 'Adding Student...' : 'Add Student'}
                     </Button>

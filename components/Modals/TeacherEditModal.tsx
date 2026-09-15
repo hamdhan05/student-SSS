@@ -192,48 +192,44 @@ export default function TeacherEditModal({ isOpen, onClose, teacherId }: Teacher
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
                             <Input
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
-                                className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Subject/Domain</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject/Domain</label>
                             <Input
                                 name="domain"
                                 value={formData.domain}
                                 onChange={handleChange}
                                 required
-                                className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
                             <Input
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
-                                className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Phone</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone</label>
                             <Input
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleChange}
                                 required
-                                className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Date of Birth</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date of Birth</label>
                             <Input
                                 type="date"
                                 name="dateOfBirth"
@@ -241,67 +237,62 @@ export default function TeacherEditModal({ isOpen, onClose, teacherId }: Teacher
                                 onChange={handleChange}
                                 required
                                 max={new Date().toISOString().split('T')[0]}
-                                className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Address</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Address</label>
                             <textarea
                                 name="address"
                                 value={formData.address}
                                 onChange={handleChange}
                                 rows={2}
-                                className="w-full px-4 py-2 rounded-lg bg-white bg-opacity-10 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+                                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* Professional & Family Information */}
-                <div className="bg-white bg-opacity-5 p-6 rounded-xl border border-gray-700">
-                    <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                        <span className="p-2 bg-purple-500 bg-opacity-20 rounded-lg text-purple-400">🎓</span>
+                <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
+                        <span className="p-2 rounded-lg bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400">🎓</span>
                         Professional & Family
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Qualification</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Qualification</label>
                             <Input
                                 name="qualification"
                                 value={formData.qualification}
                                 onChange={handleChange}
                                 required
-                                className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Experience</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Experience</label>
                             <Input
                                 name="experience"
                                 value={formData.experience}
                                 onChange={handleChange}
                                 required
-                                className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Father Name</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Father Name</label>
                             <Input
                                 name="fatherName"
                                 value={formData.fatherName}
                                 onChange={handleChange}
                                 required
-                                className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Mother Name</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mother Name</label>
                             <Input
                                 name="motherName"
                                 value={formData.motherName}
                                 onChange={handleChange}
                                 required
-                                className="bg-white bg-opacity-10 text-white"
                             />
                         </div>
                     </div>
@@ -369,7 +360,7 @@ export default function TeacherEditModal({ isOpen, onClose, teacherId }: Teacher
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-700">
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <Button
                         type="button"
                         onClick={onClose}
@@ -380,7 +371,6 @@ export default function TeacherEditModal({ isOpen, onClose, teacherId }: Teacher
                     <Button
                         type="submit"
                         disabled={updateTeacherMutation.isPending}
-                        className="bg-white text-black hover:bg-gray-200"
                     >
                         {updateTeacherMutation.isPending ? 'Saving...' : 'Save Changes'}
                     </Button>
