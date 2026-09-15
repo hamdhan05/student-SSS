@@ -9,22 +9,25 @@ self.__BUILD_MANIFEST = {
     "static/chunks/fe5b9df25e80e255.js"
   ],
   "/headmaster": [
-    "static/chunks/2ab8dfeca2739aab.js"
+    "static/chunks/c4ebfa4fedf29b42.js"
   ],
   "/login": [
     "static/chunks/edc9f0bf1a2b39a4.js"
   ],
   "/student": [
-    "static/chunks/fffab878d5099a62.js"
+    "static/chunks/0cc072a5891ec155.js"
   ],
   "/students/[id]": [
     "static/chunks/c31f604fad89cea5.js"
   ],
   "/teacher": [
-    "static/chunks/7f36e72f40340a8a.js"
+    "static/chunks/a8ae7d97428064d4.js"
   ],
   "/teachers/[id]": [
-    "static/chunks/f6f2be7aafb9398d.js"
+    "static/chunks/28a42fb705b7a0ae.js"
+  ],
+  "/verify": [
+    "static/chunks/a14a14c4f3948f75.js"
   ],
   "__rewrites": {
     "afterFiles": [],
@@ -46,6 +49,7 @@ self.__BUILD_MANIFEST = {
     "/student",
     "/students/[id]",
     "/teacher",
-    "/teachers/[id]"
+    "/teachers/[id]",
+    "/verify"
   ]
 };self.__BUILD_MANIFEST_CB && self.__BUILD_MANIFEST_CB()
