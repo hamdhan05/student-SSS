@@ -75,36 +75,59 @@ a {
 input,
 select,
 textarea {
-  @apply bg-surface text-gray-600 border border-gray-200 rounded-lg shadow-sm placeholder-gray-400 transition-all duration-200;
-  @apply focus:ring-2 focus:ring-brand-light focus:border-brand focus:outline-none;
-  @apply dark:bg-white/10 dark:text-white dark:border-gray-600 dark:focus:ring-blue-900 dark:focus:border-blue-500;
+  @apply bg-surface text-slate-800 border border-slate-200 rounded-lg text-sm shadow-sm placeholder-slate-400 transition-all duration-200;
+  @apply focus:ring-2 focus:ring-blue-100 focus:border-brand focus:outline-none;
+  @apply dark:bg-white/10 dark:text-white dark:border-slate-700 dark:focus:ring-blue-900 dark:focus:border-blue-500;
 }
 
 /* Card Styling */
 .card {
-  @apply bg-surface border border-gray-100 shadow-sm rounded-xl transition-all duration-200;
-  @apply dark:bg-black/70 dark:border-gray-800 dark:backdrop-blur-xl dark:shadow-none;
+  @apply bg-surface border border-slate-200/80 shadow-sm rounded-2xl transition-all duration-200;
+  @apply dark:bg-slate-900/90 dark:border-slate-800 dark:backdrop-blur-xl dark:shadow-none;
+}
+
+/* Badge Pill Utility Classes */
+.badge-active {
+  @apply px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800;
+}
+
+.badge-inactive {
+  @apply px-2.5 py-1 text-xs font-semibold rounded-full bg-rose-50 text-rose-700 border border-rose-200/60 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800;
+}
+
+.badge-pending {
+  @apply px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200/60 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800;
+}
+
+.badge-male {
+  @apply px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-700 border border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800;
+}
+
+.badge-female {
+  @apply px-2.5 py-1 text-xs font-semibold rounded-full bg-pink-50 text-pink-700 border border-pink-200/60 dark:bg-pink-950/40 dark:text-pink-400 dark:border-pink-800;
+}
+
+.badge-role-admin {
+  @apply px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase rounded-full bg-orange-500 text-white shadow-sm;
 }
 
 /* Table styling */
 table {
   border-collapse: collapse;
   width: 100%;
-  border-radius: 10px;
-  overflow: hidden;
 }
 
 th {
-  @apply bg-gray-50 text-gray-600 font-semibold text-left px-6 py-4;
-  @apply dark:bg-white/10 dark:text-white;
+  @apply bg-slate-50/80 text-slate-500 font-medium text-xs uppercase tracking-wider text-left px-5 py-3.5 border-b border-slate-200/80;
+  @apply dark:bg-slate-800/60 dark:text-slate-400 dark:border-slate-800;
 }
 
 tr {
-  @apply border-b border-gray-100 last:border-0;
-  @apply dark:border-gray-800;
+  @apply border-b border-slate-100 hover:bg-slate-50/50 transition-colors last:border-0;
+  @apply dark:border-slate-800/60 dark:hover:bg-slate-800/30;
 }
 
 td {
-  @apply text-gray-600 px-6 py-4;
-  @apply dark:text-gray-300;
+  @apply text-slate-700 text-sm px-5 py-4 align-middle;
+  @apply dark:text-slate-300;
 }

@@ -37,8 +37,7 @@ export function useAuth() {
       role = 'headmaster';
       name = 'Headmaster Admin';
       id = 'headmaster_1';
-    }
-    else {
+    } else {
       // 1. Check Students Table
       const { data: student, error: studentError } = await supabase
         .from('students')

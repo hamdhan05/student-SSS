@@ -78,6 +78,30 @@ export const getStudents = async (params?: {
   };
 };
 
+export const getStudentStats = async () => {
+  const [{ count: total }, { count: boys }, { count: girls }] = await Promise.all([
+    supabase.from('students').select('*', { count: 'exact', head: true }),
+    supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Male'),
+    supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Female')
+  ]);
+
+  // For New Admissions, let's say admitted this month
+  const today = new Date();
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+  const { count: newAdmissions } = await supabase
+    .from('students')
+    .select('*', { count: 'exact', head: true })
+    .gte('admission_date', firstDay);
+
+  return {
+    total: total || 0,
+    boys: boys || 0,
+    girls: girls || 0,
+    newAdmissions: newAdmissions || 0,
+    active: total || 0 // Assuming all are active for now since no status column exists
+  };
+};
+
 export const createStudent = async (student: Omit<Student, 'id' | 'admissionDate'>) => {
   // Map camelCase to snake_case
   const dbStudent = {
@@ -733,6 +757,7 @@ export default {
   getClasses,
   getSections,
   getStudents,
+  getStudentStats,
   getStudentById,
   getTeachers,
   getTeacherById,

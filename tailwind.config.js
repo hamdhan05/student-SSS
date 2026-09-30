@@ -9,17 +9,27 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#3b82f6',
-        secondary: '#6b7280',
-        success: '#10b981',
-        danger: '#ef4444',
-        warning: '#f59e0b',
-        // Clean Campus Theme
-        brand: '#4F46E5',
-        'brand-light': '#E0E7FF',
-        accent: '#F59E0B',
-        canvas: '#F9FAFB',
+        primary: {
+          DEFAULT: '#2563EB',
+          50: '#EFF6FF',
+          100: '#DBEAFE',
+          500: '#3B82F6',
+          600: '#2563EB',
+          700: '#1D4ED8',
+        },
+        brand: {
+          DEFAULT: '#2563EB',
+          orange: '#FF5722',
+          light: '#EFF6FF',
+          dark: '#1E40AF',
+        },
+        secondary: '#64748B',
+        success: '#10B981',
+        danger: '#EF4444',
+        warning: '#F59E0B',
+        canvas: '#F8FAFC',
         surface: '#FFFFFF',
+        'card-border': '#E2E8F0',
       },
     },
   },

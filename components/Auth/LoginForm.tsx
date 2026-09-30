@@ -76,7 +76,7 @@ export default function LoginForm() {
 
           <div className="mt-6 text-center text-sm text-gray-300">
             <p className="font-medium mb-2">Test Credentials:</p>
-            <p className="text-xs">headmaster@school.com / teacher@school.com / student@school.com</p>
+            <p className="text-xs">headmaster@school.com / john.smith@school.com / alice.j@student.school.com</p>
             <p className="text-xs opacity-75">Password: any</p>
           </div>
         </form>
