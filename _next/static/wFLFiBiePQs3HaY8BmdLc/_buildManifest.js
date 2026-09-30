@@ -6,28 +6,28 @@ self.__BUILD_MANIFEST = {
     "static/chunks/7365cac0bdc6157d.js"
   ],
   "/forgot-password": [
-    "static/chunks/fe5b9df25e80e255.js"
+    "static/chunks/b54fd3dc22b69a02.js"
   ],
   "/headmaster": [
-    "static/chunks/c4ebfa4fedf29b42.js"
+    "static/chunks/3c65c8359233280b.js"
   ],
   "/login": [
-    "static/chunks/edc9f0bf1a2b39a4.js"
+    "static/chunks/f1317dbbbfdce149.js"
   ],
   "/student": [
-    "static/chunks/0cc072a5891ec155.js"
+    "static/chunks/eaa808c4a359f081.js"
   ],
   "/students/[id]": [
     "static/chunks/c31f604fad89cea5.js"
   ],
   "/teacher": [
-    "static/chunks/a8ae7d97428064d4.js"
+    "static/chunks/16a776ba59576e3d.js"
   ],
   "/teachers/[id]": [
-    "static/chunks/28a42fb705b7a0ae.js"
+    "static/chunks/5b434f75ef8109d3.js"
   ],
   "/verify": [
-    "static/chunks/a14a14c4f3948f75.js"
+    "static/chunks/ef27160d7b05b7c5.js"
   ],
   "__rewrites": {
     "afterFiles": [],
