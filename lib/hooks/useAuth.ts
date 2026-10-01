@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
 // import { teachers, students } from '../mockData'; // Deprecated for auth queries
+import { teachers, students } from '../mockData';
 
 export type UserRole = 'headmaster' | 'teacher' | 'student' | null;
 
@@ -39,29 +40,56 @@ export function useAuth() {
       id = 'headmaster_1';
     } else {
       // 1. Check Students Table
-      const { data: student, error: studentError } = await supabase
-        .from('students')
-        .select('id, name, email')
-        .eq('email', email)
-        .maybeSingle();
-
-      if (student) {
-        role = 'student';
-        name = student.name;
-        id = student.id;
-      }
-      else {
-        // 2. Check Teachers Table
-        const { data: teacher, error: teacherError } = await supabase
-          .from('teachers')
+      try {
+        const { data: student, error: studentError } = await supabase
+          .from('students')
           .select('id, name, email')
           .eq('email', email)
           .maybeSingle();
 
-        if (teacher) {
-          role = 'teacher';
-          name = teacher.name;
-          id = teacher.id;
+        if (student) {
+          role = 'student';
+          name = student.name;
+          id = student.id;
+        }
+      } catch (e) {
+        console.warn('Supabase fetch failed, falling back to mock data for student.');
+      }
+
+      if (!role) {
+        const mockStudent = students.find(s => s.email === email);
+        if (mockStudent) {
+          role = 'student';
+          name = mockStudent.name;
+          id = mockStudent.id;
+        }
+      }
+
+      if (!role) {
+        // 2. Check Teachers Table
+        try {
+          const { data: teacher, error: teacherError } = await supabase
+            .from('teachers')
+            .select('id, name, email')
+            .eq('email', email)
+            .maybeSingle();
+
+          if (teacher) {
+            role = 'teacher';
+            name = teacher.name;
+            id = teacher.id;
+          }
+        } catch (e) {
+          console.warn('Supabase fetch failed, falling back to mock data for teacher.');
+        }
+
+        if (!role) {
+          const mockTeacher = teachers.find(t => t.email === email);
+          if (mockTeacher) {
+            role = 'teacher';
+            name = mockTeacher.name;
+            id = mockTeacher.id;
+          }
         }
       }
     }
