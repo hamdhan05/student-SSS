@@ -14,10 +14,10 @@ export default function Dashboard() {
   ];
 
   const upcomingClasses = [
-    { time: '08:00 AM - 08:45 AM', title: 'Grade 8 - A Mathematics', teacher: 'Mr. Michael R.', room: '201' },
-    { time: '09:00 AM - 09:45 AM', title: 'Grade 7 - B Science', teacher: 'Ms. Priya S.', room: '102' },
-    { time: '10:00 AM - 10:45 AM', title: 'Grade 9 - A English', teacher: 'Ms. Ananya K.', room: '202' },
-    { time: '11:00 AM - 11:45 AM', title: 'Grade 6 - A Social Studies', teacher: 'Mr. John D.', room: '101' },
+    { time: '09:00 AM - 09:45 AM', title: 'Grade 8 - A Mathematics', teacher: 'Mr. Michael R.', room: '201' },
+    { time: '10:00 AM - 10:45 AM', title: 'Grade 7 - B Science', teacher: 'Ms. Priya S.', room: '102' },
+    { time: '11:00 AM - 11:45 AM', title: 'Grade 9 - A English', teacher: 'Ms. Ananya K.', room: '202' },
+    { time: '12:00 PM - 12:45 PM', title: 'Grade 6 - A Social Studies', teacher: 'Mr. John D.', room: '101' },
   ];
 
   const recentActivities = [

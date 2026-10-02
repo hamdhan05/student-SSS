@@ -364,7 +364,7 @@ export default function StudentPortal() {
               </tr>
             </thead>
             <tbody>
-              {['09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00', '12:00 - 01:00', '01:00 - 02:00'].map((time, i) => (
+              {['09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00', '12:00 - 01:00', '01:00 - 02:00', '02:00 - 03:00', '03:00 - 04:00', '04:00 - 05:00'].map((time, i) => (
                 <tr key={time}>
                   <td className="font-semibold text-slate-700">{time}</td>
                   {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day, j) => {
