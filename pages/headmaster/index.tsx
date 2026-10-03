@@ -7,8 +7,11 @@ import Notices from '@/components/Headmaster/Notices';
 import Calendar from '@/components/Headmaster/Calendar';
 import Fees from '@/components/Headmaster/Fees';
 import Complaints from '@/components/Headmaster/Complaints';
+import Settings from '@/components/Headmaster/Settings';
 
-type TabType = 'students' | 'teachers' | 'notices' | 'calendar' | 'fees' | 'complaints';
+import FeeStructure from '@/components/Headmaster/FeeStructure';
+
+type TabType = 'students' | 'teachers' | 'notices' | 'calendar' | 'fees' | 'fee_structure' | 'complaints' | 'settings';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -61,8 +64,17 @@ export default function HeadmasterPortal() {
     { id: 'teachers' as const, label: 'Teachers', icon: '👨‍🏫' },
     { id: 'notices' as const, label: 'Notice Board', icon: '📢' },
     { id: 'calendar' as const, label: 'Calendar', icon: '📅' },
-    { id: 'fees' as const, label: 'Fees', icon: '💰' },
+    { 
+      id: 'fees' as const, 
+      label: 'Fees', 
+      icon: '💰',
+      subItems: [
+        { id: 'fees', label: 'Fee Management' },
+        { id: 'fee_structure', label: 'Fee Structure' }
+      ]
+    },
     { id: 'complaints' as const, label: 'Complaints', icon: '📝' },
+    { id: 'settings' as const, label: 'Settings', icon: '⚙️' },
   ];
 
   const handleLogout = () => {
@@ -82,8 +94,12 @@ export default function HeadmasterPortal() {
         return <Calendar />;
       case 'fees':
         return <Fees />;
+      case 'fee_structure':
+        return <FeeStructure />;
       case 'complaints':
         return <Complaints />;
+      case 'settings':
+        return <Settings />;
       default:
         return <Students />;
     }

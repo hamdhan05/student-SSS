@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getStudentFees, getClasses, getSections } from '@/lib/api';
+import { getClasses, getSections } from '@/lib/api';
+import { supabase } from '@/lib/supabaseClient';
 import Input from '@/components/UI/Input';
-
 import FeeEditModal from '@/components/Modals/FeeEditModal';
 
 export default function Fees() {
@@ -10,32 +10,86 @@ export default function Fees() {
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editingFee, setEditingFee] = useState<any>(null);
+  const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
 
   const { data: classes = [] } = useQuery({
-    queryKey: ['classes'],
-    queryFn: getClasses,
+    queryKey: ['db_classes_fees'],
+    queryFn: async () => {
+        return await getClasses();
+    }
   });
 
-  const { data: sections = [] } = useQuery({
-    queryKey: ['sections'],
-    queryFn: () => getSections(),
+  const { data: feesData = [], isLoading } = useQuery({
+    queryKey: ['all_student_fees', selectedClass, selectedSection, searchQuery],
+    queryFn: async () => {
+      let query = supabase.from('students').select(`
+        id, name, roll_number, section, classes(id, name),
+        student_fee_records(amount, paid_amount, due_amount),
+        student_sports(fee_amount, paid_amount)
+      `);
+
+      if (selectedClass) {
+        query = query.eq('class_id', selectedClass.toString());
+      }
+      if (selectedSection) {
+        query = query.eq('section', selectedSection);
+      }
+      if (searchQuery) {
+        query = query.ilike('name', `%${searchQuery}%`);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    },
   });
 
-  const { data: fees = [], isLoading } = useQuery({
-    queryKey: ['fees', selectedClass, selectedSection, searchQuery],
-    queryFn: () => getStudentFees({
-      classId: selectedClass?.toString(),
-      section: selectedSection || undefined,
-      q: searchQuery || undefined,
-    }),
-  });
+  const { totalAmount, paidAmount, pendingAmount, filteredFees } = useMemo(() => {
+    let tAmount = 0;
+    let pAmount = 0;
+    
+    const mapped = feesData.map((student: any) => {
+        let scTotal = 0, scPaid = 0, scDue = 0;
+        (student.student_fee_records || []).forEach((f: any) => {
+            scTotal += Number(f.amount || 0);
+            scPaid += Number(f.paid_amount || 0);
+            scDue += Number(f.due_amount || 0);
+        });
 
-  const filteredFees = Array.isArray(fees) ? fees : [];
+        let spTotal = 0, spPaid = 0;
+        (student.student_sports || []).forEach((s: any) => {
+            spTotal += Number(s.fee_amount || 0);
+            spPaid += Number(s.paid_amount || 0);
+        });
 
-  const totalAmount = filteredFees.reduce((sum: number, item: any) => sum + (item.fees?.totalFee || 0), 0);
-  const paidAmount = filteredFees.reduce((sum: number, item: any) => sum + (item.fees?.paidAmount || 0), 0);
-  const pendingAmount = filteredFees.reduce((sum: number, item: any) => sum + (item.fees?.dueAmount || 0), 0);
+        const studentTotal = scTotal + spTotal;
+        const studentPaid = scPaid + spPaid;
+        const studentDue = studentTotal - studentPaid;
+
+        tAmount += studentTotal;
+        pAmount += studentPaid;
+
+        return {
+            id: student.id,
+            rollNumber: student.roll_number,
+            name: student.name,
+            class: student.classes?.name,
+            section: student.section,
+            schoolTotal: scTotal,
+            sportsTotal: spTotal,
+            overallTotal: studentTotal,
+            overallPaid: studentPaid,
+            overallDue: studentDue
+        };
+    });
+
+    return {
+        totalAmount: tAmount,
+        paidAmount: pAmount,
+        pendingAmount: tAmount - pAmount,
+        filteredFees: mapped
+    };
+  }, [feesData]);
 
   return (
     <div className="space-y-6">
@@ -65,7 +119,7 @@ export default function Fees() {
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name or roll..."
+              placeholder="Search by name..."
               variant="glass"
             />
           </div>
@@ -78,9 +132,9 @@ export default function Fees() {
               className="w-full px-4 py-2 rounded-lg bg-surface text-gray-600 border border-gray-200 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-light dark:focus:ring-blue-500"
             >
               <option value="" className="bg-white text-gray-900 dark:bg-black dark:text-white">All Classes</option>
-              {classes.map((cls) => (
-                <option key={cls} value={cls} className="bg-white text-gray-900 dark:bg-black dark:text-white">
-                  Class {cls}
+              {classes.map((cls: any) => (
+                <option key={cls.id} value={cls.id} className="bg-white text-gray-900 dark:bg-black dark:text-white">
+                  Class {cls.name}
                 </option>
               ))}
             </select>
@@ -88,18 +142,12 @@ export default function Fees() {
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Section</label>
-            <select
-              value={selectedSection || ''}
-              onChange={(e) => setSelectedSection(e.target.value || null)}
-              className="w-full px-4 py-2 rounded-lg bg-surface text-gray-600 border border-gray-200 dark:bg-white dark:bg-opacity-10 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-light dark:focus:ring-blue-500"
-            >
-              <option value="" className="bg-white text-gray-900 dark:bg-black dark:text-white">All Sections</option>
-              {sections.map((sec) => (
-                <option key={sec} value={sec} className="bg-white text-gray-900 dark:bg-black dark:text-white">
-                  Section {sec}
-                </option>
-              ))}
-            </select>
+            <Input
+                placeholder="Section (e.g. A)"
+                value={selectedSection || ''}
+                onChange={(e) => setSelectedSection(e.target.value || null)}
+                variant="glass"
+            />
           </div>
         </div>
       </div>
@@ -115,60 +163,35 @@ export default function Fees() {
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-white">Roll No</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-white">Student Name</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 dark:text-white">Class/Sec</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-white">Total</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-white">Paid</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-white">Due</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600 dark:text-white">Term 1</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600 dark:text-white">Term 2</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600 dark:text-white">Term 3</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-white">School Fee</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-white">Sports Fee</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-white">Overall Total</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-white">Overall Paid</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-white">Overall Due</th>
                 <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600 dark:text-white">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredFees.map((item: any) => {
-                const { student, fees: feeData } = item;
-                const terms = feeData.terms || [];
-                const term1 = terms.find((t: any) => t.name === 'Term 1');
-                const term2 = terms.find((t: any) => t.name === 'Term 2');
-                const term3 = terms.find((t: any) => t.name === 'Term 3');
-
-                const renderTermStatus = (term: any) => {
-                  if (!term) return <span className="text-gray-500">-</span>;
-                  const colors = {
-                    paid: 'bg-green-900 text-green-400',
-                    pending: 'bg-yellow-900 text-yellow-400',
-                    overdue: 'bg-red-900 text-red-400',
-                  };
-                  return (
-                    <div className="flex flex-col items-center">
-                      <span className={`px-2 py-0.5 rounded text-xs font-semibold bg-opacity-30 ${colors[term.status as keyof typeof colors]}`}>
-                        {term.status}
-                      </span>
-                      <span className="text-xs text-gray-600 dark:text-gray-400 mt-1">₹{term.amount.toLocaleString()}</span>
-                    </div>
-                  );
-                };
-
                 return (
-                  <tr key={student.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/5">
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{student.rollNumber}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-white font-medium">{student.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{student.class}-{student.section}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-white text-right font-medium">₹{feeData.totalFee.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-sm text-green-600 dark:text-green-400 text-right">₹{feeData.paidAmount.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-sm text-red-600 dark:text-red-400 text-right">₹{feeData.dueAmount.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-center">{renderTermStatus(term1)}</td>
-                    <td className="px-6 py-4 text-center">{renderTermStatus(term2)}</td>
-                    <td className="px-6 py-4 text-center">{renderTermStatus(term3)}</td>
+                  <tr key={item.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/5">
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{item.rollNumber}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-white font-medium">{item.name}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{item.class}-{item.section}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-white text-right font-medium">₹{item.schoolTotal.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-white text-right font-medium">₹{item.sportsTotal.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-blue-600 dark:text-blue-400 text-right font-bold">₹{item.overallTotal.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-green-600 dark:text-green-400 text-right font-bold">₹{item.overallPaid.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-red-600 dark:text-red-400 text-right font-bold">₹{item.overallDue.toLocaleString()}</td>
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => {
-                          setEditingFee(item);
+                          setEditingStudentId(item.id);
                           setEditModalOpen(true);
                         }}
                         className="text-blue-400 hover:text-blue-300 text-sm font-medium"
                       >
-                        Edit
+                        Manage
                       </button>
                     </td>
                   </tr>
@@ -182,19 +205,15 @@ export default function Fees() {
           )}
         </div>
       )}
-      {editingFee && (
+      
+      {editingStudentId && (
         <FeeEditModal
           isOpen={editModalOpen}
           onClose={() => {
             setEditModalOpen(false);
-            setEditingFee(null);
+            setEditingStudentId(null);
           }}
-          student={{
-            id: editingFee.student.id,
-            name: editingFee.student.name,
-            rollNumber: editingFee.student.rollNumber
-          }}
-          initialTerms={editingFee.fees.terms || []}
+          studentId={editingStudentId}
         />
       )}
     </div>

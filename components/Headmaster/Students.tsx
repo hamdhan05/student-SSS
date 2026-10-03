@@ -4,10 +4,11 @@ import { getStudents, getClasses, getSections, getStudentStats } from '@/lib/api
 import StudentDetailModal from '@/components/Modals/StudentDetailModal';
 import StudentEditModal from '@/components/Modals/StudentEditModal';
 import AddStudentModal from '@/components/Modals/AddStudentModal';
+import PromoteStudentsModal from '@/components/Modals/PromoteStudentsModal';
 
 export default function Students() {
   const [page, setPage] = useState(1);
-  const [selectedClass, setSelectedClass] = useState<number | null>(null);
+  const [selectedClass, setSelectedClass] = useState<string | null>(null);
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
@@ -15,6 +16,7 @@ export default function Students() {
   const [viewStudentId, setViewStudentId] = useState<string | null>(null);
   const [editStudentId, setEditStudentId] = useState<string | null>(null);
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
+  const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
 
   // Fetch classes
   const { data: classes = [] } = useQuery({
@@ -84,6 +86,15 @@ export default function Students() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
             Import Students
+          </button>
+          <button
+            onClick={() => setIsPromoteModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-purple-600 rounded-xl hover:bg-purple-700 shadow-sm shadow-purple-500/20 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            Promote Students
           </button>
           <button
             onClick={() => setIsAddStudentModalOpen(true)}
@@ -194,12 +205,12 @@ export default function Students() {
           {/* Class Selector */}
           <select
             value={selectedClass || ''}
-            onChange={(e) => setSelectedClass(e.target.value ? Number(e.target.value) : null)}
+            onChange={(e) => setSelectedClass(e.target.value ? String(e.target.value) : null)}
             className="px-3 py-2 text-xs w-36"
           >
             <option value="">All Classes</option>
-            {classes.map((cls) => (
-              <option key={cls} value={cls}>Grade {cls}</option>
+            {classes.map((cls: any) => (
+              <option key={cls.id} value={cls.id}>Class {cls.name}</option>
             ))}
           </select>
 
@@ -284,6 +295,7 @@ export default function Students() {
                   </th>
                   <th>Student</th>
                   <th>Admission No.</th>
+                  <th>EMIS No.</th>
                   <th>Roll No.</th>
                   <th>Class - Section</th>
                   <th>Date of Birth</th>
@@ -317,9 +329,10 @@ export default function Students() {
                         </div>
                       </td>
                       <td className="text-xs font-medium text-slate-600 dark:text-slate-300">{admissionNo}</td>
+                      <td className="text-xs font-medium text-blue-600 dark:text-blue-400">{student.emisNumber || '-'}</td>
                       <td className="text-xs font-bold text-slate-800 dark:text-slate-200">{student.rollNumber}</td>
                       <td className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                        Grade {student.class} - {student.section}
+                        Class {student.class} - {student.section}
                       </td>
                       <td className="text-xs text-slate-500">{dob}</td>
                       <td>
@@ -417,6 +430,11 @@ export default function Students() {
       <AddStudentModal
         isOpen={isAddStudentModalOpen}
         onClose={() => setIsAddStudentModalOpen(false)}
+      />
+      
+      <PromoteStudentsModal
+        isOpen={isPromoteModalOpen}
+        onClose={() => setIsPromoteModalOpen(false)}
       />
     </div>
   );

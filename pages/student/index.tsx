@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRequireAuth } from '@/lib/hooks/useAuth';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getStudentById, getAttendanceByStudent, createComplaint, getNotices } from '@/lib/api';
+import { getStudentById, getAttendanceByStudent, createComplaint, getNotices, getStudentAcademicComponents } from '@/lib/api';
 import Modal from '@/components/UI/Modal';
 import Layout from '@/components/UI/Layout';
 import StudentHomework from '@/components/Student/Homework';
@@ -28,6 +28,12 @@ export default function StudentPortal() {
   const { data: notices = [] } = useQuery({
     queryKey: ['notices'],
     queryFn: getNotices,
+  });
+
+  const { data: additionalAcademics = [] } = useQuery({
+    queryKey: ['student_academic_components', studentId],
+    queryFn: () => getStudentAcademicComponents(studentId),
+    enabled: !!studentId,
   });
 
   const createComplaintMutation = useMutation({
@@ -341,12 +347,34 @@ export default function StudentPortal() {
                 </div>
               </div>
             ))}
-            {(!student?.academics || student.academics.length === 0) && (
+            
+            {/* Additional Academic Components */}
+            {additionalAcademics.map((record: any) => (
+              <div key={`${record.component_id}-${record.term}`} className="card p-6 space-y-3 border-purple-200 dark:border-purple-900/50">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">{record.component?.name || 'Additional Component'}</h3>
+                  <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-bold">{record.term}</span>
+                </div>
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Marks Obtained:</span>
+                    <span className="font-semibold text-slate-800 dark:text-white">{record.marks}</span>
+                  </div>
+                  <div className="flex justify-between border-t border-slate-100 pt-2 font-bold text-slate-900 dark:text-white">
+                    <span>Status:</span>
+                    <span className="text-purple-600 text-sm">Completed</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {(!student?.academics || student.academics.length === 0) && additionalAcademics.length === 0 && (
               <div className="col-span-full card p-8 text-center text-slate-500">
                 No academic records available.
               </div>
             )}
           </div>
+
         </div>
       )}
 

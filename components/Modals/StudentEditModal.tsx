@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getStudentById, updateStudent } from '@/lib/api';
+import { getStudentById, updateStudent, getClasses } from '@/lib/api';
 import Modal from '@/components/UI/Modal';
 import Input from '@/components/UI/Input';
 import Button from '@/components/UI/Button';
@@ -23,6 +23,7 @@ interface StudentFormData {
   rollNumber: string;
   admissionNumber: string;
   emisNumber: string;
+  academicYear: string;
   parentName: string;
   parentPhone: string;
   parentEmail: string;
@@ -42,6 +43,11 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
     retry: 1,
   });
 
+  const { data: classes = [] } = useQuery({
+    queryKey: ['classes'],
+    queryFn: getClasses,
+  });
+
   const [formData, setFormData] = useState<StudentFormData>({
     name: '',
     email: '',
@@ -53,6 +59,7 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
     rollNumber: '',
     admissionNumber: '',
     emisNumber: '',
+    academicYear: '',
     parentName: '',
     parentPhone: '',
     parentEmail: '',
@@ -79,6 +86,7 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
         rollNumber: student.rollNumber || '',
         admissionNumber: student.admissionNumber || '',
         emisNumber: student.emisNumber || '',
+        academicYear: student.academicYear || '',
         parentName: student.parentName || '',
         parentPhone: student.parentPhone || '',
         parentEmail: student.parentEmail || '',
@@ -102,6 +110,12 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
       queryClient.invalidateQueries({ queryKey: ['student', studentId] });
+      queryClient.invalidateQueries({ queryKey: ['all_student_fees'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard_stats'] });
+      queryClient.invalidateQueries({ queryKey: ['attendance'] });
+      queryClient.invalidateQueries({ queryKey: ['class_students'] });
+      queryClient.invalidateQueries({ queryKey: ['sports_roster'] });
+      queryClient.invalidateQueries({ queryKey: ['student_notices'] });
       setSuccessMessage('Student updated successfully!');
       setTimeout(() => {
         setSuccessMessage(null);
@@ -115,7 +129,22 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setFormError(null);
+    if (!formData.class) {
+      setFormError('Please select a class.');
+      return;
+    }
+    if (!formData.emisNumber) {
+      setFormError('EMIS number is required.');
+      return;
+    }
+    if (!formData.parentName || !formData.parentPhone) {
+      setFormError('Parent Name and Parent Phone are required.');
+      return;
+    }
+    if (!formData.dateOfBirth) {
+      setFormError('Date of Birth is required.');
+      return;
+    }
     updateStudentMutation.mutate(formData);
   };
 
@@ -180,26 +209,28 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
                 name="rollNumber"
                 value={formData.rollNumber}
                 onChange={handleChange}
-                required
               />
               <Input
                 label="Admission Number"
                 name="admissionNumber"
                 value={formData.admissionNumber}
                 onChange={handleChange}
+                required
               />
               <Input
                 label="EMIS Number"
                 name="emisNumber"
                 value={formData.emisNumber}
                 onChange={handleChange}
+                required
               />
               <div className="flex flex-col">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gender</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gender *</label>
                 <select
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
+                  required
                   className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                 >
                   <option value="Male">Male</option>
@@ -228,18 +259,34 @@ export default function StudentEditModal({ isOpen, onClose, studentId }: Student
                 name="dateOfBirth"
                 value={formData.dateOfBirth}
                 onChange={handleChange}
-              />
-              <Input
-                label="Class"
-                name="class"
-                value={formData.class}
-                onChange={handleChange}
                 required
               />
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
+                <select
+                  name="class"
+                  value={formData.class}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                >
+                  <option value="">Select Class</option>
+                  {classes.map((cls: any) => (
+                    <option key={cls.id} value={cls.id}>{cls.name}</option>
+                  ))}
+                </select>
+              </div>
               <Input
                 label="Section"
                 name="section"
                 value={formData.section}
+                onChange={handleChange}
+                required
+              />
+              <Input
+                label="Academic Year"
+                name="academicYear"
+                value={formData.academicYear}
                 onChange={handleChange}
                 required
               />

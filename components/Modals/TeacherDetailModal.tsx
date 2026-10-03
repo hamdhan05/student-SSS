@@ -118,6 +118,54 @@ export default function TeacherDetailModal({
                             </div>
                         </div>
                     </div>
+
+                    {/* Weekly Timetable */}
+                    <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Weekly Timetable</h3>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="text-xs text-gray-500 uppercase bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                                    <tr>
+                                        <th className="px-4 py-3 font-semibold rounded-tl-lg">Day</th>
+                                        <th className="px-4 py-3 font-semibold">09:00 - 09:45</th>
+                                        <th className="px-4 py-3 font-semibold">10:00 - 10:45</th>
+                                        <th className="px-4 py-3 font-semibold">11:00 - 11:45</th>
+                                        <th className="px-4 py-3 font-semibold">12:00 - 12:45</th>
+                                        <th className="px-4 py-3 font-semibold rounded-tr-lg">14:00 - 14:45</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => (
+                                        <tr key={day} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                            <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{day}</td>
+                                            {/* Generate deterministic mock schedule based on teacher name and day */}
+                                            {[1, 2, 3, 4, 5].map((period) => {
+                                                const seed = day.charCodeAt(0) + period + teacher.name.length;
+                                                const hasClass = seed % 3 !== 0; // 2/3 chance of having a class
+                                                
+                                                if (!hasClass) {
+                                                    return <td key={period} className="px-4 py-3 text-gray-400 dark:text-gray-500 italic">Free</td>;
+                                                }
+                                                
+                                                // Pick a random class from their assigned classes, or fallback to a default
+                                                const classes = teacher.classes && teacher.classes.length > 0 
+                                                    ? teacher.classes 
+                                                    : ['Class 10 - A', 'Class 9 - B', 'Class 11 - Science'];
+                                                const assignedClass = classes[seed % classes.length];
+                                                
+                                                return (
+                                                    <td key={period} className="px-4 py-3">
+                                                        <div className="font-medium text-gray-900 dark:text-gray-100">{assignedClass}</div>
+                                                        <div className="text-xs text-blue-600 dark:text-blue-400">{teacher.subject || teacher.domain}</div>
+                                                    </td>
+                                                );
+                                            })}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             ) : (
                 <div className="text-center py-8 text-gray-400">Teacher not found</div>

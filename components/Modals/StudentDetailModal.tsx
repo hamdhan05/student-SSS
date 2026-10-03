@@ -89,12 +89,20 @@ export default function StudentDetailModal({
               <h3 className="text-xl font-semibold text-white mb-4">Personal Information</h3>
               <div className="space-y-3">
                 <div>
+                  <p className="text-gray-400 text-sm mb-1">EMIS Number</p>
+                  <p className="text-white font-medium">{student.emisNumber || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm mb-1">Admission Number</p>
+                  <p className="text-white font-medium">{student.admissionNumber || 'N/A'}</p>
+                </div>
+                <div>
                   <p className="text-gray-400 text-sm mb-1">Email</p>
-                  <p className="text-white font-medium break-all">{student.email}</p>
+                  <p className="text-white font-medium break-all">{student.email || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm mb-1">Phone</p>
-                  <p className="text-white font-medium">{student.phone}</p>
+                  <p className="text-white font-medium">{student.phone || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm mb-1">Date of Birth</p>
@@ -124,6 +132,47 @@ export default function StudentDetailModal({
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Fee & Sports Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-blue-900 bg-opacity-20 rounded-lg p-6 border border-blue-800">
+              <h3 className="text-xl font-semibold text-blue-200 mb-4">Fee Summary</h3>
+              {student.student_fee_records && student.student_fee_records.length > 0 ? (
+                <div className="space-y-2">
+                  {student.student_fee_records.map((fee: any) => (
+                    <div key={fee.id} className="flex justify-between items-center text-sm border-b border-blue-800 pb-2">
+                      <span className="text-blue-100">Fee Amount</span>
+                      <span className="text-white font-bold">₹{fee.amount}</span>
+                    </div>
+                  ))}
+                  <div className="pt-2 flex justify-between items-center text-sm font-semibold">
+                    <span className="text-blue-300">Total Pending:</span>
+                    <span className="text-white">
+                      ₹{student.student_fee_records.reduce((sum: number, f: any) => sum + Number(f.due_amount), 0)}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-blue-300 text-sm">No fee records found.</p>
+              )}
+            </div>
+
+            <div className="bg-green-900 bg-opacity-20 rounded-lg p-6 border border-green-800">
+              <h3 className="text-xl font-semibold text-green-200 mb-4">Sports Enrollment</h3>
+              {student.student_sports && student.student_sports.length > 0 ? (
+                <div className="space-y-2">
+                  {student.student_sports.map((ss: any) => (
+                    <div key={ss.id} className="flex justify-between items-center text-sm border-b border-green-800 pb-2">
+                      <span className="text-green-100">{ss.sport?.name || 'Unknown Sport'}</span>
+                      <span className="text-white font-bold">₹{ss.fee_amount}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-green-300 text-sm">Not enrolled in any sports.</p>
+              )}
             </div>
           </div>
 

@@ -7,6 +7,7 @@ export interface Tab {
   icon: string | ReactNode;
   category?: string;
   onClick?: () => void;
+  subItems?: { id: string; label: string; onClick?: () => void }[];
 }
 
 interface LayoutProps {
@@ -134,28 +135,75 @@ export default function Layout({
               <ul className="space-y-1">
                 {catTabs.map((tab) => {
                   const isActive = activeTab === tab.id;
+                  const hasSubItems = tab.subItems && tab.subItems.length > 0;
+                  const isSubItemActive = hasSubItems && tab.subItems!.some(sub => sub.id === activeTab);
+                  const isExpanded = isActive || isSubItemActive;
+
                   return (
                     <li key={tab.id}>
                       <button
                         onClick={() => {
-                          if (onTabChange && !tab.onClick) {
-                            onTabChange(tab.id);
-                          } else if (tab.onClick) {
-                            tab.onClick();
+                          if (hasSubItems) {
+                             // If it has subitems, we might just expand/collapse it or route to the first subitem
+                             if (onTabChange && !tab.onClick) {
+                               onTabChange(tab.subItems![0].id);
+                             }
+                          } else {
+                             if (onTabChange && !tab.onClick) {
+                               onTabChange(tab.id);
+                             } else if (tab.onClick) {
+                               tab.onClick();
+                             }
+                             closeSidebar();
                           }
-                          closeSidebar();
                         }}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 text-sm font-medium ${
-                          isActive
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all duration-150 text-sm font-medium ${
+                          isExpanded && !hasSubItems
                             ? 'bg-blue-50 text-blue-700 font-semibold dark:bg-blue-900/40 dark:text-blue-300'
                             : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-200'
                         }`}
                       >
-                        <span className={`text-lg ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}`}>
-                          {tab.icon}
-                        </span>
-                        <span className="flex-1 text-left">{tab.label}</span>
+                        <div className="flex items-center gap-3">
+                            <span className={`text-lg ${isExpanded ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                              {tab.icon}
+                            </span>
+                            <span className="flex-1 text-left">{tab.label}</span>
+                        </div>
+                        {hasSubItems && (
+                           <svg className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                           </svg>
+                        )}
                       </button>
+                      
+                      {hasSubItems && isExpanded && (
+                          <ul className="mt-1 ml-9 space-y-1">
+                             {tab.subItems!.map((sub) => {
+                                const isSubActive = activeTab === sub.id;
+                                return (
+                                   <li key={sub.id}>
+                                     <button
+                                       onClick={() => {
+                                          if (onTabChange && !sub.onClick) {
+                                            onTabChange(sub.id);
+                                          } else if (sub.onClick) {
+                                            sub.onClick();
+                                          }
+                                          closeSidebar();
+                                       }}
+                                       className={`w-full text-left px-3 py-1.5 rounded-lg transition-colors text-sm ${
+                                          isSubActive
+                                            ? 'text-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
+                                            : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800/50'
+                                       }`}
+                                     >
+                                        {sub.label}
+                                     </button>
+                                   </li>
+                                );
+                             })}
+                          </ul>
+                      )}
                     </li>
                   );
                 })}

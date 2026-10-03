@@ -22,8 +22,21 @@ const delay = (ms: number = 300) => new Promise(resolve => setTimeout(resolve, m
 
 // Classes and Sections
 export const getClasses = async () => {
-  await delay();
-  return classes;
+  const { data, error } = await supabase.from('classes').select('*');
+  if (error) throw error;
+  
+  return data.sort((a, b) => {
+      // Sort Pre-KG, LKG, UKG first, then numbers
+      const order: Record<string, number> = { 'Pre-KG': 1, 'LKG': 2, 'UKG': 3 };
+      const aOrder = order[a.name];
+      const bOrder = order[b.name];
+      
+      if (aOrder && bOrder) return aOrder - bOrder;
+      if (aOrder) return -1;
+      if (bOrder) return 1;
+      
+      return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+  });
 };
 
 export const getSections = async (classId?: string) => {
@@ -40,14 +53,14 @@ export const getStudents = async (params?: {
   q?: string;
 }) => {
   let query = supabase.from('students').select(`
-    id, name, rollNumber:roll_number, class:class_grade, section, photo,
+    id, name, rollNumber:roll_number, class_id, classes(name), section, photo,
     dateOfBirth:dob, gender, email, phone, address,
     parentName:parent_name, parentPhone:parent_phone, parentEmail:parent_email,
     admissionDate:admission_date, admissionNumber:admission_number, emisNumber:emis_number
   `, { count: 'exact' });
 
   if (params?.classId) {
-    query = query.eq('class_grade', params.classId.toString());
+    query = query.eq('class_id', params.classId.toString());
   }
 
   if (params?.section) {
@@ -56,7 +69,7 @@ export const getStudents = async (params?: {
 
   if (params?.q) {
     const q = params.q;
-    query = query.or(`name.ilike.%${q}%,roll_number.ilike.%${q}%,email.ilike.%${q}%`);
+    query = query.or(`name.ilike.%${q}%,roll_number.ilike.%${q}%,email.ilike.%${q}%,emis_number.ilike.%${q}%,admission_number.ilike.%${q}%`);
   }
 
   const page = params?.page || 1;
@@ -70,8 +83,14 @@ export const getStudents = async (params?: {
 
   if (error) throw error;
 
+  const mappedData = data.map((d: any) => ({
+    ...d,
+    class: d.classes?.name,
+    classes: undefined
+  }));
+
   return {
-    data: data as unknown as Student[], // Type assertion due to aliasing
+    data: mappedData as unknown as Student[], // Type assertion due to aliasing
     total: count || 0,
     page,
     totalPages: Math.ceil((count || 0) / limit),
@@ -107,7 +126,7 @@ export const createStudent = async (student: Omit<Student, 'id' | 'admissionDate
   const dbStudent = {
     name: student.name,
     roll_number: student.rollNumber,
-    class_grade: student.class,
+    class_id: student.classId || student.class,
     section: student.section,
     photo: student.photo,
     dob: student.dateOfBirth,
@@ -120,11 +139,12 @@ export const createStudent = async (student: Omit<Student, 'id' | 'admissionDate
     parent_email: student.parentEmail,
     admission_number: student.admissionNumber,
     emis_number: student.emisNumber,
+    academic_year: student.academicYear,
     // admission_date: default provided by DB or handled here? DB has default current_date.
   };
 
   const { data, error } = await supabase.from('students').insert(dbStudent).select(`
-     id, name, rollNumber:roll_number, class:class_grade, section, photo,
+     id, name, rollNumber:roll_number, classId:class_id, section, photo,
     dateOfBirth:dob, gender, email, phone, address,
     parentName:parent_name, parentPhone:parent_phone, parentEmail:parent_email,
     admissionDate:admission_date
@@ -139,13 +159,15 @@ export const getStudentById = async (id: string) => {
   const { data: student, error } = await supabase
     .from('students')
     .select(`
-      id, name, rollNumber:roll_number, class:class_grade, section, photo,
+      id, name, rollNumber:roll_number, class:class_id, section, photo,
       dateOfBirth:dob, gender, email, phone, address,
       parentName:parent_name, parentPhone:parent_phone, parentEmail:parent_email,
       admissionDate:admission_date,
       guardianName:guardian_name, guardianPhone:guardian_phone,
       admissionNumber:admission_number, emisNumber:emis_number,
-      fee_records (*),
+      academicYear:academic_year,
+      student_fee_records (*),
+      student_sports (*, sport:sports(name, fee)),
       attendance_records (id, date, status),
       academic_records (subject, marks, total_marks, grade, term)
     `)
@@ -159,7 +181,7 @@ export const getStudentById = async (id: string) => {
   // Assuming strict foreign key might make it object, but let's handle array possibility safely or object.
   // Based on strict schema, it might be an object or array. Standard Supabase select on reversed FK is usually array unless 1:1.
   // We'll treat it as potentially array[0] or object.
-  const feesData = Array.isArray(student.fee_records) ? student.fee_records[0] : student.fee_records;
+  const feesData = Array.isArray((student as any).student_fee_records) ? (student as any).student_fee_records[0] : (student as any).student_fee_records;
 
   let fees = null;
   if (feesData) {
@@ -287,11 +309,33 @@ export const getTeacherById = async (id: string) => {
   };
 };
 
-export const updateStudent = async (student: Student) => {
+export const updateStudent = async (student: Student & { classId?: string, academicYear?: string }) => {
+  // Check for duplicate EMIS
+  const { data: existingEmis } = await supabase
+      .from('students')
+      .select('id')
+      .eq('emis_number', student.emisNumber)
+      .neq('id', student.id)
+      .maybeSingle();
+  if (existingEmis) {
+      throw new Error('Student with this EMIS number already exists.');
+  }
+
+  // Check for duplicate Admission Number
+  const { data: existingAdm } = await supabase
+      .from('students')
+      .select('id')
+      .eq('admission_number', student.admissionNumber)
+      .neq('id', student.id)
+      .maybeSingle();
+  if (existingAdm) {
+      throw new Error('Admission number already exists.');
+  }
+
   const dbStudent = {
     name: student.name,
     roll_number: student.rollNumber,
-    class_grade: student.class,
+    class_id: student.classId || student.class, // Fallback if classId is passed as class
     section: student.section,
     photo: student.photo,
     dob: student.dateOfBirth,
@@ -304,16 +348,72 @@ export const updateStudent = async (student: Student) => {
     parent_email: student.parentEmail,
     admission_number: student.admissionNumber,
     emis_number: student.emisNumber,
+    academic_year: student.academicYear,
   };
 
+  // Fetch existing to check class change
+  const { data: currentStudent } = await supabase.from('students').select('class_id, academic_year').eq('id', student.id).single();
+
   const { data, error } = await supabase.from('students').update(dbStudent).eq('id', student.id).select(`
-     id, name, rollNumber:roll_number, class:class_grade, section, photo,
+     id, name, rollNumber:roll_number, classId:class_id, section, photo,
     dateOfBirth:dob, gender, email, phone, address,
     parentName:parent_name, parentPhone:parent_phone, parentEmail:parent_email,
     admissionDate:admission_date
   `).single();
 
   if (error) throw error;
+
+  if (currentStudent && currentStudent.class_id !== dbStudent.class_id) {
+      // Log History
+      try {
+          await supabase.from('student_academic_history').insert({
+              student_id: student.id,
+              from_class_id: currentStudent.class_id,
+              to_class_id: dbStudent.class_id,
+              academic_year: dbStudent.academic_year || currentStudent.academic_year
+          });
+      } catch (e) {}
+
+      // Regenerate Fees
+      await supabase.from('student_fee_records').delete().eq('student_id', student.id).eq('payment_status', 'pending');
+      
+      const { data: classFees } = await supabase.from('class_fee_structures').select('*').eq('class_id', dbStudent.class_id);
+      if (classFees && classFees.length > 0) {
+          const feeRecords = classFees.map((fs: any) => ({
+              student_id: student.id,
+              fee_type_id: fs.fee_type_id,
+              amount: fs.amount,
+              paid_amount: 0,
+              due_amount: fs.amount,
+              academic_year: dbStudent.academic_year || currentStudent.academic_year,
+              payment_status: 'pending'
+          }));
+          await supabase.from('student_fee_records').insert(feeRecords);
+      }
+
+      // Initialize Gradebook
+      const defaultSubjects = ['Mathematics', 'Science', 'English', 'History', 'Physics'];
+      const academicRecordsToInsert = defaultSubjects.map(sub => ({
+          student_id: student.id,
+          subject: sub,
+          marks: null,
+          total_marks: 100,
+          grade: null,
+          term: 'Term 1'
+      }));
+      try {
+          await supabase.from('academic_records').insert(academicRecordsToInsert);
+      } catch (e) {}
+  }
+
+  // System Log
+  try {
+      await supabase.from('system_logs').insert({
+          action: 'Student Updated',
+          description: `Student ${student.name} profile was updated.`,
+      });
+  } catch (e) {}
+
   return data as unknown as Student;
 };
 
@@ -455,10 +555,10 @@ export const updateFeeRecord = async (studentId: string, terms: any[]) => {
 
 export const getStudentFees = async (params: { classId?: string; section?: string; q?: string }) => {
   // First get students
-  let query = supabase.from('students').select('id, name, roll_number, class_grade, section');
+  let query = supabase.from('students').select('id, name, roll_number, class_id, section');
 
   if (params.classId) {
-    query = query.eq('class_grade', params.classId);
+    query = query.eq('class_id', params.classId.toString());
   }
   if (params.section) {
     query = query.eq('section', params.section);
@@ -472,45 +572,48 @@ export const getStudentFees = async (params: { classId?: string; section?: strin
   if (studentError) throw studentError;
 
   // Then get fees for these students
-  // Ideally we use a join, but for simplicity/mapping to current structure:
   const studentIds = studentsData.map(s => s.id);
-  const { data: feesData, error: feeError } = await supabase.from('fee_records').select('*').in('student_id', studentIds);
+  
+  if (studentIds.length === 0) return [];
+
+  const { data: feesData, error: feeError } = await supabase.from('student_fee_records').select('*').in('student_id', studentIds);
 
   if (feeError) throw feeError;
 
+  const { data: sportsData } = await supabase.from('student_sports').select('*, sport:sports(*)').in('student_id', studentIds);
+
   return studentsData.map(s => {
-    const f = feesData?.find(fee => fee.student_id === s.id);
+    const studentFees = feesData?.filter(fee => fee.student_id === s.id) || [];
+    const ss = sportsData?.filter(sport => sport.student_id === s.id) || [];
+
+    const totalFee = studentFees.reduce((sum, f) => sum + Number(f.amount), 0);
+    const paidAmount = studentFees.reduce((sum, f) => sum + Number(f.paid_amount), 0);
+    const dueAmount = totalFee - paidAmount;
 
     // Shape student
     const studentObj = {
       id: s.id,
       name: s.name,
       rollNumber: s.roll_number,
-      class: s.class_grade,
+      class: s.class_id,
       section: s.section
     } as any;
 
     // Shape fees
-    const feesObj = f ? {
-      id: f.id,
-      studentId: f.student_id,
-      totalFee: f.total_fee,
-      paidAmount: f.paid_amount,
-      dueAmount: f.due_amount,
-      lastPaymentDate: f.last_payment_date,
-      lastPaymentAmount: f.last_payment_amount,
-      terms: f.terms
-    } : {
-      totalFee: 50000,
-      paidAmount: 0,
-      dueAmount: 50000,
-      lastPaymentDate: null,
-      lastPaymentAmount: 0,
+    const feesObj = {
+      studentId: s.id,
+      totalFee: totalFee,
+      paidAmount: paidAmount,
+      dueAmount: dueAmount,
+      lastPaymentDate: studentFees[0]?.updated_at || null,
+      lastPaymentAmount: studentFees[0]?.last_payment_amount || 0,
+      terms: studentFees
     };
 
     return {
       student: studentObj,
-      fees: feesObj
+      fees: feesObj,
+      sports: ss
     };
   });
 };
@@ -580,10 +683,10 @@ export const getAttendanceByClassAndDate = async (classId: string, section: stri
   const { data, error } = await supabase.from('attendance_records')
     .select(`
       id, studentId:student_id, date, status,
-      students!inner ( class_grade, section )
+      students!inner ( class_id, section )
     `)
     .eq('date', date)
-    .eq('students.class_grade', classId)
+    .eq('students.class_id', classId)
     .eq('students.section', section);
 
   if (error) throw error;
@@ -753,6 +856,90 @@ export const createHomework = async (homework: Omit<Homework, 'id' | 'createdAt'
   return data as Homework;
 };
 
+// Sports
+export const getSports = async () => {
+  const { data, error } = await supabase.from('sports').select('*').order('name');
+  if (error) {
+    console.error(error);
+    return []; // fallback
+  }
+  return data;
+};
+
+export const getStudentSports = async (studentId: string) => {
+  const { data, error } = await supabase.from('student_sports').select('*, sport:sports(*)').eq('student_id', studentId);
+  if (error) {
+    console.error(error);
+    return [];
+  }
+  return data;
+};
+
+export const enrollStudentSport = async (studentId: string, sportId: string) => {
+  const { data, error } = await supabase.from('student_sports').insert({ student_id: studentId, sport_id: sportId }).select().single();
+  if (error) throw error;
+  return data;
+};
+
+export const unenrollStudentSport = async (studentId: string, sportId: string) => {
+  const { error } = await supabase.from('student_sports').delete().eq('student_id', studentId).eq('sport_id', sportId);
+  if (error) throw error;
+  return true;
+};
+
+export const payStudentSport = async (studentId: string, sportId: string, amount: number) => {
+  const { data: curr } = await supabase.from('student_sports').select('paid_amount').eq('student_id', studentId).eq('sport_id', sportId).single();
+  const newAmount = (Number(curr?.paid_amount) || 0) + Number(amount);
+  
+  const { data, error } = await supabase.from('student_sports').update({ 
+    paid_amount: newAmount, 
+    payment_date: new Date().toISOString().split('T')[0],
+    status: 'paid' 
+  }).eq('student_id', studentId).eq('sport_id', sportId).select().single();
+  
+  if (error) throw error;
+  return data;
+};
+
+// Academic Components
+export const getAcademicComponents = async () => {
+  const { data, error } = await supabase.from('academic_components').select('*').order('name');
+  if (error) {
+    console.error(error);
+    return [];
+  }
+  return data;
+};
+
+export const getStudentAcademicComponents = async (studentId: string) => {
+  const { data, error } = await supabase.from('student_academic_components').select('*, component:academic_components(*)').eq('student_id', studentId);
+  if (error) {
+    console.error(error);
+    return [];
+  }
+  return data;
+};
+
+export const upsertStudentAcademicComponent = async (studentId: string, componentId: string, term: string, marks: number) => {
+  const { data, error } = await supabase.from('student_academic_components')
+    .upsert({ student_id: studentId, component_id: componentId, term, marks }, { onConflict: 'student_id, component_id, term' })
+    .select().single();
+  if (error) throw error;
+  return data;
+};
+
+export const createSport = async (name: string, fee: number) => {
+  const { data, error } = await supabase.from('sports').insert({ name, fee }).select().single();
+  if (error) throw error;
+  return data;
+};
+
+export const createAcademicComponent = async (name: string) => {
+  const { data, error } = await supabase.from('academic_components').insert({ name }).select().single();
+  if (error) throw error;
+  return data;
+};
+
 export default {
   getClasses,
   getSections,
@@ -784,4 +971,12 @@ export default {
   updateTeacher,
   getHomework,
   createHomework,
+  getSports,
+  getStudentSports,
+  enrollStudentSport,
+  unenrollStudentSport,
+  payStudentSport,
+  getAcademicComponents,
+  getStudentAcademicComponents,
+  upsertStudentAcademicComponent,
 };
